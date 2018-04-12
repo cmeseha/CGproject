@@ -70,7 +70,7 @@ while (len(queue) != 0):
         print("shit")
     #update beach line (all other parabolas)
     for site in beachLineSites: 
-        x = range(site[0]-5, site[0] + 5)
+        x = range(site[0]-20, site[0] + 20)
         parab = parabolaD(site[0], site[1], event[0] - .5, x)
         beachLineParabY.append(parab)
         beachLineParabX.append(x)
