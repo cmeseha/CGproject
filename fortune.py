@@ -14,32 +14,72 @@ root = parabola(0) #beach line tree
 a = []
 b = []
 
-keyPressed = False
+beachLineSites = []
+beachLineParabY = []
+beachLineParabX = []
 
 def plotGraph(a, b):
     plt.plot(a, b, 'ro')
-    plt.axis([0, 10, 0, 10])
+    plt.axis([0, 20, 0, 20])
     plt.show()
 
+def parabola(h, k, xCoordinates):
+    return [(x - h)**2 + k for x in xCoordinates]
+    #return [(k / h ** 2) * (x - h) ** 2 for x in xCoordinates]
+
+#parabola using focus and directrix
+def parabolaD(a, b, c, xCoordinates):
+    return [(((x - a)**2 + b**2 - c**2)/(2*(b-c))) for x in xCoordinates]
+
+def plotParabs(beachLineX, beachLineY):
+    for i in range(0, len(beachLineX)):
+        plt.plot(beachLineX[i], beachLineY[i], '-')
 
 #for each point in the point cloud
 for site in points:
         #create a site event
         siteEvent = Vevent(site, True)
+
     
         #insert site event into queue
         heapq.heappush(queue, (siteEvent.y, siteEvent))
         a.append(site[0])
         b.append(site[1])
-
 plotGraph(a, b)
 
 while (len(queue) != 0):
-    event = heapq.heappop(queue)
+    heapq._heapify_max(queue)
+    event = heapq._heappop_max(queue)
+    beachLineSites.append((event[1].x, event[0]))
+    beachLineParabX.clear()
+    beachLineParabY.clear()
     if (event[1].eventType):
-        addParabola(event.point)
+        print(event[0])
+        plt.axhline(y=event[0], color='r', linestyle='-')
+        x = range(event[1].x - 5, event[1].x + 5)
+        print(x)
+        #parab = parabola(event[1].x, event[0], x) 
+        parab = parabolaD(event[1].x, event[0], event[0] - .5, x)
+        plt.plot(a, b, 'ro', x, parab, '-')
+        plt.axis([0, 20, 0, 20])
+        plt.show()
+        #plotGraph(a, b)
+        #addParabola(event.point)
     else:
-        removeParabola(event.arch)
+        #removeParabola(event.arch)
+        print("shit")
+    #update beach line (all other parabolas)
+    for site in beachLineSites: 
+        x = range(site[0]-5, site[0] + 5)
+        parab = parabolaD(site[0], site[1], event[0] - .5, x)
+        beachLineParabY.append(parab)
+        beachLineParabX.append(x)
+    plt.plot(a, b, 'ro', x, parab, '-')
+    plt.axhline(y=event[0], color='r', linestyle='-')    
+    plotParabs(beachLineParabX, beachLineParabY)
+    plt.axis([0, 20, 0, 20])
+    plt.show()
+    #add Voronoi edges
 
     """
     text = raw_input("Press enter to continue")
@@ -52,6 +92,8 @@ while (len(queue) != 0):
         plt.plot(event[0])
         keyPressed = False
     """
+
+
 
 """
 for x in range(-50, 50, 1):
