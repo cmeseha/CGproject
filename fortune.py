@@ -55,14 +55,10 @@ while (len(queue) != 0):
     beachLineParabY.clear()
     if (event[1].eventType):
         print(event[0])
-        plt.axhline(y=event[0], color='r', linestyle='-')
-        x = range(event[1].x - 5, event[1].x + 5)
-        print(x)
+        
+    
         #parab = parabola(event[1].x, event[0], x) 
-        parab = parabolaD(event[1].x, event[0], event[0] - .5, x)
-        plt.plot(a, b, 'ro', x, parab, '-')
-        plt.axis([0, 20, 0, 20])
-        plt.show()
+
         #plotGraph(a, b)
         #addParabola(event.point)
     else:
