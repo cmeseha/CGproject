@@ -13,9 +13,8 @@ class Vevent:
 		self.point = point
 		self.eventType = eventType
 		#self.y = self.point.y
-		self.y = self.point[1]
-		self.x = self.point[0]
-		self.arch = 0
+		self.valid = True
+
 
 
 
