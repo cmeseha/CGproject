@@ -51,7 +51,7 @@ def intersection(line1, line2):
         return intersect_points 
 
 
-def intersect(point, aboveArc, newArc)
+def intersect(point, aboveArc, newArc):
     if (aboveArc.site[1] == point[1]):
         return
 
@@ -61,39 +61,39 @@ def intersect(point, aboveArc, newArc)
     if (aboveArc.right):
         b = intersection(aboveArc.getPoints(), aboveArc.right.getPoints())
         bX = a[0][0]
-    if (((aboveArc.left == None) || (aX <= point[0])) && ((aboveArc.right == None) || (bX <= point[0])))   
+    if ((aboveArc.left == None) or (aX <= point[0])) and ((aboveArc.right == None) or (bX <= point[0])):
         newArc.pointsX = range(point[0]-20, point[0] + 20)
-        newArc.pointsY = newArc.parabolaD(arcAbove.site[0], arcAbove.site[1], point[1] - .5, newArc.pointsX)
+        newArc.pointsY = newArc.parabolaD(aboveArc.site[0], aboveArc.site[1], point[1] - .5, newArc.pointsX)
         intersectPoints = intersection(newArc.getPoints(), aboveArc.getPoints())
         return intersectPoints[0]
     return 
 
 
 
-def checkCircleEvent(parabola, y)
+def checkCircleEvent(parabola, y):
 
     #check for old events
-    if ((parabola.event) && (parabola.site[1] != y)):
+    if ((parabola.event) and (parabola.site[1] != y)):
         parabola.event.valid = False
     parabola.event = None
 
     #if can't have circle event return
-    if ((not parabola.left) || (not parabola.right)):
+    if ((not parabola.left) or (not parabola.right)):
         return
 
     #check circle and if so, add circle event to the queue
     circleData = circle(parabola.left.site, parabola.site, parabola.right.site)
-    if (circleData && circleData[1] < y):
+    if (circleData and circleData[1] < y):
         parabola.event = Vevent(circleData[0], False, parabola)
         parabola.event.leastY = circleData[1]
         heapq.heappush(queue, (circleData[0][1], parabola.event))
 
 
 
-def circle(a, b, c)
+def circle(a, b, c):
     #check for 90 degree turn between bc and ab
-    if ((b[0]-a[0])*(c[1]-a[1]) - (c[0]-a[0])*(b[1]-a[1]) > 0)
-       return false;
+    if ((b[0]-a[0])*(c[1]-a[1]) - (c[0]-a[0])*(b[1]-a[1]) > 0):
+       return False
 
     A = b[0]-a[0]
     B = b[1]-a[1]
@@ -104,7 +104,8 @@ def circle(a, b, c)
     G = 2*(A*(c[1]-b[1]) - B*(c[0]-b[0]))
 
     #if g = 0, then points are colinear not circle
-    if (G == 0) return
+    if (G == 0):
+        return
 
     #get center point of circle
     center = (((D*E-B*F)/G), ((A*F-C*E)/G))
@@ -124,7 +125,7 @@ def addParabola(event):
     parabola.pointsX = range(point[0]-20, point[0] + 20)
     parabola.pointsY = parabola.parabolaD(point[0], point[1], point[1] - .5, x)
 
-    if (root == None):
+    if root == None:
         root = parabola
         return
 
@@ -133,10 +134,10 @@ def addParabola(event):
     while(arcAbove != None):
         inter1 = intersect(point, arcAbove, parabola)
         inter2 = ()
-        if (inter1)    
+        if (inter1):
             inter2 = intersect(point, arcAbove.right, parabola)
             #duplicates the arcAbove if doesn't intersect
-            if((arcAbove.right != None) && (not inter2)):
+            if((arcAbove.right != None) and (not inter2)):
                 arcAbove.right.left = parabola(arcAbove.point, event, arcAbove, arcAbove.right)
                 arcAbove.right = arcAbove.right.left
             else:
@@ -167,7 +168,7 @@ def addParabola(event):
 
     #if it doesn't intersect any arc on the beach line so far
     arcAbove = root
-    while(arcAbov.right != None):
+    while(arcAbove.right != None):
         arcAbove = arcAbove.right
 
     arcAbove.right = parabola(point, event, arcAbove, None)
@@ -205,17 +206,14 @@ def removeParabola(event):
 
     del event
 
-#for each unfinished edge, set their endpoints to the bounding box
+# for each unfinished edge, set their endpoints to the bounding box
 def boundEdges():
     return
 
-#plot all the sites, current Voronoi edges, current beachline, and current sweepline
+
+# plot all the sites, current Voronoi edges, current beachline, and current sweepline
 def plotGraph():
     return
-
-
-
-
 
 
 
