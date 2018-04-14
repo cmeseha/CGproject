@@ -1,5 +1,4 @@
 
-
 # Defines VEvent data structure
 
 # point   - the current Vpoint responsible for the event
@@ -9,12 +8,8 @@
 
    
 class Vevent:
-	def __init__(self, point, eventType):
+	def __init__(self, point, eventType, y):
 		self.point = point
 		self.eventType = eventType
-		#self.y = self.point.y
+		self.y = y
 		self.valid = True
-
-
-
-

@@ -12,7 +12,6 @@ class parabola:
 """
 class parabola:
 	def __init__(self, site, event, left, right):
-	#def __init__(self, site, event, pointsX, pointsY):
 		self.site = site
 		self.event = event
 		self.pointsX = []
@@ -29,6 +28,6 @@ class parabola:
 			points.append(point)
 		return points
 
-	#parabola using focus and directrix
+	# parabola using focus and directrix
 	def parabolaD(self, a, b, c, xCoordinates):
 		return [(((x - a)**2 + b**2 - c**2)/(2*(b-c))) for x in xCoordinates]

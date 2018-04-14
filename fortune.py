@@ -113,6 +113,7 @@ def circle(a, b, c):
     return (center, leastY)
 
 
+
 def addParabola(event):
     point = event.point
     parabola = parabola(point, event, None, None)
@@ -167,7 +168,7 @@ def addParabola(event):
 
     arcAbove.right = parabola(point, event, arcAbove, None)
     newEdgeStartY = 0
-    newEdgeStartX = (arcAbove.right.site[0] + arcAbove.site[0]) / 2;
+    newEdgeStartX = (arcAbove.right.site[0] + arcAbove.site[0]) / 2
     arcAbove.vEdge2 = Vedge((newEdgeStartX, newEdgeStartY))
     arcAbove.right.vEdge1 = Vedge((newEdgeStartX, newEdgeStartY))
 
@@ -207,14 +208,15 @@ def boundEdges():
 
 
 # plot all the sites, current Voronoi edges, current beachline, and current sweepline
-def plotGraph():
-    return
+# def plotGraph():
+#     return
 
 
 # for each point in the point cloud
 for site in points:
     # create a site event
-    siteEvent = Vevent(site, True, None)
+    # heappush uses siteEvent.y so I added a y attribute
+    siteEvent = Vevent(site, True, site[1])
 
     # insert site event into queue
     heapq.heappush(queue, (siteEvent.y, siteEvent))
