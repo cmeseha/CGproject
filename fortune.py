@@ -100,7 +100,7 @@ def circle(a, b, c):
     F = C * (a[0] + c[0]) + D * (a[1] + c[1])
     G = 2 * (A * (c[1] - b[1]) - B * (c[0] - b[0]))
 
-    # if g = 0, then points are colinear not circle
+    # if g = 0, then points are collinear not circle
     if G == 0:
         return
 

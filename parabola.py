@@ -31,4 +31,4 @@ class parabola:
 
 	#parabola using focus and directrix
 	def parabolaD(self, a, b, c, xCoordinates):
-    	return [(((x - a)**2 + b**2 - c**2)/(2*(b-c))) for x in xCoordinates]
+		return [(((x - a)**2 + b**2 - c**2)/(2*(b-c))) for x in xCoordinates]
