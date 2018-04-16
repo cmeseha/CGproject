@@ -116,7 +116,7 @@ def circle(a, b, c):
 
 def addParabola(event):
     point = event.point
-    parabola = parabola(point, event, None, None)
+    parabola = Parabola(point, event, None, None)
     parabola.pointsX = range(point[0] - 20, point[0] + 20)
     parabola.pointsY = parabola.parabolaD(point[0], point[1], point[1] - .5, x)
 
