@@ -4,7 +4,10 @@ JavaScript and a little bit of CSS styling -->
 <!DOCTYPE html>
 <html>
 	<head>
+		<!-- Use the JavaScript file -->
         <script type="text/javascript" src="voronoi.js"></script>
+		
+        <!-- Styling of header elements -->
 		<style type="text/css">
 			h1 {
 				margin-top: 0px; 
@@ -18,6 +21,8 @@ JavaScript and a little bit of CSS styling -->
 			}
 		</style>
 	</head>
+
+	<!-- Load canvas -->
 	<body onload="Voronoi.init();">
 		<h1>Fortune's Algorithm </h1>
 		<h2>
@@ -25,11 +30,13 @@ JavaScript and a little bit of CSS styling -->
 		Then, click "Start" to begin the demo.</font></h2>
 		<div>
 			<div>
+				<!-- Buttons for generating 20 sites and starting demo -->
 				<input type="button" value="Generate Sites" onclick="Voronoi.clearSites();Voronoi.generateSites(20);"/>
 				<input id="voronoiAnimateSweepline" type="button" value="Start" onclick="VoronoiAnimate(4, 200);document.getElementById('voronoiAnimateSweeplineDelay').value=VoronoiAnimateDelay;"/>
 			</div>
 			<div>
 				<br/>
+				<!-- Display canvas -->
 				<canvas id="fortuneCanvas" width="800" height="600"></canvas>
 			</div>
 		</div>
