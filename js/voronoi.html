@@ -1,3 +1,6 @@
+<!-- This is the HTML file that demos our implementation of Fortune's Algorithm using
+JavaScript and a little bit of CSS styling -->
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -16,18 +19,18 @@
 		</style>
 	</head>
 	<body onload="Voronoi.init();">
-		<h1>Fortune's algorithm </h1>
+		<h1>Fortune's Algorithm </h1>
 		<h2>
 		<font size=3> Click "Generate Sites" to generate 20 random sites.
 		Then, click "Start" to begin the demo.</font></h2>
-		<div id="divroot" style="width:800px;">
-			<div class="divinfo" id="voronoiGenerator">
+		<div>
+			<div>
 				<input type="button" value="Generate Sites" onclick="Voronoi.clearSites();Voronoi.generateSites(20);"/>
-				<input id="voronoiAnimateSweepline" type="button" value="Start" onclick="VoronoiAnimate(4, 100);document.getElementById('voronoiAnimateSweeplineDelay').value=VoronoiAnimateDelay;"/>
+				<input id="voronoiAnimateSweepline" type="button" value="Start" onclick="VoronoiAnimate(4, 200);document.getElementById('voronoiAnimateSweeplineDelay').value=VoronoiAnimateDelay;"/>
 			</div>
-			<div id="canvasParent">
+			<div>
 				<br/>
-				<canvas id="voronoiCanvas" width="800" height="600"></canvas>
+				<canvas id="fortuneCanvas" width="800" height="600"></canvas>
 			</div>
 		</div>
 	</body>

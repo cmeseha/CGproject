@@ -1181,7 +1181,7 @@ var Voronoi = {
 
 	initCanvas: function() {
 		if (this.canvas) {return;}
-		var canvas = document.getElementById('voronoiCanvas');
+		var canvas = document.getElementById('fortuneCanvas');
 		if (!canvas.getContext) {return;}
 		var ctx = canvas.getContext('2d');
 		if (!ctx) {return;}
