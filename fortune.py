@@ -48,24 +48,32 @@ def intersection(line1, line2):
     if not intersect_points:
         return 0
     else:
+        print("intersection points")
+        print(intersect_points)
         return intersect_points
 
 
 def intersect(point, aboveArc, newArc):
     if aboveArc.site[1] == point[1]:
+        print("equal")
         return
 
     if aboveArc.left:
+        print("left")
         a = intersection(aboveArc.left.getPoints(), aboveArc.getPoints())
         aX = a[0][0]
     if aboveArc.right:
+        print("right")
         b = intersection(aboveArc.getPoints(), aboveArc.right.getPoints())
         bX = a[0][0]
-    if ((aboveArc.left is None) or (aX <= point[0])) and ((aboveArc.right == None) or (bX <= point[0])):
+    if ((aboveArc.left is None) or (aX <= point[0])) and ((aboveArc.right is None) or (bX <= point[0])):
+        print("creating new arc")
+        print(aX)
+        print(bX)
         newArc.pointsX = range(point[0] - 20, point[0] + 20)
         newArc.pointsY = newArc.parabolaD(aboveArc.site[0], aboveArc.site[1], point[1] - .5, newArc.pointsX)
         intersectPoints = intersection(newArc.getPoints(), aboveArc.getPoints())
-        return intersectPoints[0]
+        return intersectPoints
     return
 
 
@@ -118,18 +126,20 @@ def addParabola(event):
     point = event.point
     parabola = Parabola(point, event, None, None)
     parabola.pointsX = range(point[0] - 20, point[0] + 20)
-    parabola.pointsY = parabola.parabolaD(point[0], point[1], point[1] - .5, x)
+    parabola.pointsY = parabola.parabolaD(point[0], point[1], point[1] - .5, parabola.pointsX)
     global root
+    print("root is " + str(root))
     if root is None:
         root = parabola
+        print("now root is " + str(root))
         return
 
     # find current arc if any
     arcAbove = root
     while arcAbove is not None:
         inter1 = intersect(point, arcAbove, parabola)
-        inter2 = ()
         if (inter1):
+            print("Made it here!")
             inter2 = intersect(point, arcAbove.right, parabola)
             # duplicates the arcAbove if doesn't intersect
             if ((arcAbove.right != None) and (not inter2)):
@@ -226,6 +236,7 @@ for site in points:
 plotGraph(a, b)
 
 while len(queue) != 0:
+    print(len(queue))
     heapq._heapify_max(queue)
     event = heapq._heappop_max(queue)
     print("\n")
