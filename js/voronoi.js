@@ -1,9 +1,7 @@
 /*global self */
 
 let Voronoi = {
-	//
 	// Properties
-	//
 	sites: [],
 	siteEvents: [],
 	circEvents: [],
@@ -41,9 +39,7 @@ let Voronoi = {
 	canvasMargin: 0,
 	bbox: {xl:0,xr:800,yt:0,yb:600},
 
-	//
 	// Objects
-	//
 	Beachsection: function(site) {
 		this.site = site;
 		this.edge = null;
@@ -81,41 +77,25 @@ let Voronoi = {
 		this.edge = edge;
 		},
 
-	//
-	// Debugging stuff
-	//
-	assert: function(v) {
-		if (!v) {debugger;}
-		},
-
-	//
 	//  Methods
-	//
 	init: function() {
-		// prototype our inner classes, more efficient than having these Javascript
-		// properties repeated for all instances.
+		// prototype inner classes to stop repeating code
 		this.Beachsection.prototype.PARENT = this;
 		this.Beachsection.prototype.sqrt = self.Math.sqrt;
-		// given parabola 'site', return the intersection with parabola 'left'
-		// immediately to the left of x
+		// return the intersection with parabola 'left'
 		this.Beachsection.prototype._leftParabolicCut=function(site,left,directrix) {
-			// change code below at your own risk:
-			// care has been taken to reduce errors due to
-			// computers' finite arithmetic precision.
-			// maybe can still be improved, will see if any
-			// more of this kind of errors pop up again
 			this.PARENT.PARABOLIC_CUT_CALCS++;
 			let rfocx = site.x;
 			let rfocy = site.y;
-			// parabola in degenerate case where focus is on directrix
+			// parabola in degenerate case
 			if (rfocy == directrix) {return rfocx;}
 			let lfocx = left.x;
 			let lfocy = left.y;
 			// parabola in degenerate case where focus is on directrix
 			if (lfocy == directrix) {return lfocx;}
-			// both parabolas have same distance to directrix, thus break point is midway
+			// both parabolas have same distance to directrix, break point is midway
 			if (rfocy == lfocy) {return (rfocx+lfocx)/2;}
-			// calculate break point the normal way
+			// calculate break point
 			let pby2 = rfocy-directrix;
 			let plby2 = lfocy-directrix;
 			let hl = lfocx-rfocx;
@@ -123,7 +103,6 @@ let Voronoi = {
 			let b = hl/plby2;
 			return (-b+this.sqrt(b*b-2*aby2*(hl*hl/(-2*plby2)-lfocy+plby2/2+rfocy-pby2/2)))/aby2+rfocx;
 			};
-		// higher level method which caches result and attempt to reuse it
 		this.Beachsection.prototype.leftParabolicCut=function(left,sweep){
 			this.PARENT.ALL_PARABOLIC_CUT_CALCS++;
 			if (this.sweep !== sweep || this.lid !== left.id) {
@@ -157,14 +136,11 @@ let Voronoi = {
 		// prepare canvas
 		this.initCanvas();
 
-		// and randomly generate a bunch of sites to have something to see
+		// randomly generate a bunch of sites
 		this.generateSites(this.DEFAULT_NUM_SITES);
 		},
 
-	//
-	// Epsilon-based comparison methods
-	//
-	// Note: changed to 1e-5, 1e-6 was still causing errors once in a while
+	// comparison methods
 	EPSILON: 1e-4,
 	equalWithEpsilon: function(a,b){return this.abs(a-b)<1e-4;},
 	greaterThanWithEpsilon: function(a,b){return (a-b)>1e-4;},
@@ -172,9 +148,7 @@ let Voronoi = {
 	lessThanWithEpsilon: function(a,b){return (b-a)>1e-4;},
 	lessThanOrEqualWithEpsilon: function(a,b){return (a-b)<1e-4;},
 
-	//
-	// Sites management methods
-	//
+	// Sites management
 	clearSites: function() {
 		this.sites = [];
 		this.reset();
@@ -206,74 +180,7 @@ let Voronoi = {
 			}
 		},
 
-	parseSites: function(s) {
-		// split string into values, eliminate all NaNs
-		let values=s.split(/[^0-9-.+e]+/);
-		let nValues=values.length;
-		let iValue=0;
-		while (iValue<nValues) {
-			if (this.isNaN(parseFloat(values[iValue]))) {
-				values.splice(iValue,1);
-				nValues--;
-				}
-			else {
-				iValue++;
-				}
-			}
-		// number of x,y pairs
-		let nPairs = values.length & 0xfffe;
-		let x; let y;
-		for (let iPair=0; iPair<nPairs; iPair+=2) {
-			x = parseFloat(values[iPair]);
-			y = parseFloat(values[iPair+1]);
-			if (!this.isNaN(x) && !this.isNaN(y)) {
-				this.sites.push(new this.Site(x,y));
-				}
-			}
-		this.reset();
-		this.processQueueAll();
-		},
-
-	parseLattices: function(s) {
-		// split string into values, eliminate all NaNs
-		let values = s.split(/[^0-9-.+e]+/);
-		let nValues = values.length;
-		let iValue = 0;
-		while (iValue < nValues) {
-			if (this.isNaN(self.parseFloat(values[iValue]))) {
-				values.splice(iValue,1);
-				nValues--;
-				}
-			else {
-				iValue++;
-				}
-			}
-		// number of quadruplets
-		let nQuads = values.length & 0xfffc;
-		let w = this.canvas.width;
-		let h = this.canvas.height;
-		let offx; let offy;
-		let dx; let dy;
-		for (let iQuad=0; iQuad<nQuads; iQuad+=4) {
-			offx = self.parseFloat(values[iQuad]);
-			offy = self.parseFloat(values[iQuad+1]);
-			dx = self.parseFloat(values[iQuad+2]);
-			dy = self.parseFloat(values[iQuad+3]);
-			if (!this.isNaN(offx) && !this.isNaN(offy) && !this.isNaN(dx) && !this.isNaN(dy)) {
-				for (let y=offy; y<(h+dy); y+=dy) {
-					for (let x=offx; x<=(w+dx); x+=dx) {
-						this.sites.push(new this.Site(x,y));
-						}
-					}
-				}
-			}
-		this.reset();
-		this.processQueueAll();
-		},
-
-	//
-	// Fortune algorithm methods
-	//
+	// Fortune algorithm
 	reset: function() {
 		this.NUM_SITES_PROCESSED = 0;
 		this.BINARY_SEARCHES = 0;
@@ -292,8 +199,7 @@ let Voronoi = {
 		this.draw();
 		},
 
-	// calculate the left break point of a particular beach section,
-	// given a particular sweep line
+	// calculate the left break point of beach section
 	leftBreakPoint: function(iarc, sweep) {
 		let arc = this.arcs[iarc];
 		let site = arc.site;
@@ -302,8 +208,7 @@ let Voronoi = {
 		return arc.leftParabolicCut(this.arcs[iarc-1].site,sweep);
 		},
 
-	// calculate the right break point of a particular beach section,
-	// given a particular directrix
+	// calculate the right break point of beach section
 	rightBreakPoint: function(iarc, sweep) {
 		if (iarc < this.arcs.length-1) {
 			return this.leftBreakPoint(iarc+1,sweep);
@@ -313,15 +218,6 @@ let Voronoi = {
 		},
 
 	// find the index where a new site should be inserted.
-	// the index will be immediately following the left beach section.
-	// special case 1: the new site's parabola might not touch any beach section:
-	// this happens *only* when all the beach sections of the current beachline
-	// are on the directrix.
-	// In such case, the insertion point is always at the end of the list,
-	// since sites are processed with increasing y, then increasing x (IMPORTANT!)
-	// special case 2: the new site falls exactly in between two beach sections, in
-	// such case, the insertion point is as expected, before the right-hand beach
-	// section
 	findInsertionPoint: function(x, sweep) {
 		this.BINARY_SEARCHES++;
 		let n = this.arcs.length;
@@ -346,7 +242,6 @@ let Voronoi = {
 		return l;
 		},
 
-	// INFO: Chromium profiling shows this a hot spot
 	findDeletionPoint: function(x, sweep) {
 		this.BINARY_SEARCHES++;
 		let n = this.arcs.length;
@@ -378,17 +273,14 @@ let Voronoi = {
 				}
 			return i;
 			}
-		//this.assert(false);
 		},
 
-	// this create and add an edge to internal collection, and also create
+	// this creates and adds an edge to internal collection, and also create
 	// two halfedges which are added to each site's counterclockwise array
 	// of halfedges.
 	createEdge: function(lSite,rSite,va,vb) {
 		let edge = new this.Edge(lSite,rSite);
 		this.edges.push(edge);
-		//this.assert(this.cells[lSite.id] != undefined);
-		//this.assert(this.cells[rSite.id] != undefined);
 		if (va !== undefined) {
 			this.setEdgeStartpoint(edge,lSite,rSite,va);
 			}
@@ -413,23 +305,15 @@ let Voronoi = {
 		},
 
 	setEdgeStartpoint: function(edge, lSite, rSite, vertex) {
-		//this.assert((edge.lSite.id == lSite.id && edge.rSite.id == rSite.id) || (edge.rSite.id == lSite.id && edge.lSite.id == rSite.id));
-
-		// I use to assert both va and vb weren't the same, but this
-		// can happen under normal circumstances, this should not be
-		// treated as an error
-
 		if (edge.va === undefined && edge.vb === undefined) {
 			edge.va = vertex;
 			edge.lSite = lSite;
 			edge.rSite = rSite;
 			}
 		else if (edge.lSite.id == rSite.id) {
-			//this.assert(edge.vb === undefined);
 			edge.vb = vertex;
 			}
 		else {
-			//this.assert(edge.va === undefined);
 			edge.va = vertex;
 			}
 		},
@@ -442,10 +326,6 @@ let Voronoi = {
 		let y = event.center.y;
 		let sweep = event.y;
 		let deletionPoint = this.findDeletionPoint(x, sweep);
-		// there could be more than one empty arc at the deletion point, this
-		// happens when more than two edges are linked by the same vertex,
-		// so we will collect all those edges by looking up both sides of
-		// the deletion point
 		// look left
 		let iLeft = deletionPoint;
 		while (iLeft-1 > 0 && this.equalWithEpsilon(x,this.leftBreakPoint(iLeft-1,sweep)) ) {
@@ -490,22 +370,13 @@ let Voronoi = {
 		let newArc = new this.Beachsection(site);
 		let insertionPoint = this.findInsertionPoint(site.x,site.y);
 
-		// case: insert as last beach section, this case can happen only
-		// when *all* previously processed sites have exactly the same
-		// y coordinate.
-		// this case can't result in collapsing beach sections, thus
-		// no circle events need to be generated.
+		// insert as last beach section
 		if (insertionPoint == this.arcs.length) {
-
 			// add new beach section
 			this.arcs.push(newArc);
-
-			// case: first beach section ever means no transitions, means
-			// no edge is created
+			// first beach section means no edge is created
 			if (insertionPoint === 0) {return;}
-
-			// case: a new transition between two beach sections is
-			// created, create an edge for these two beach sections
+			// new transition between two beach sections is created, create an edge
 			newArc.edge = this.createEdge(this.arcs[insertionPoint-1].site,newArc.site);
 
 			return;
@@ -513,35 +384,21 @@ let Voronoi = {
 
 		let lArc, rArc;
 
-		// case: new beach section to insert falls exactly
-		// in between two existing beach sections:
-		// the net result is that the transition between two existing beach
-		// sections is destroyed -- aka a new end point for one edge is
-		// defined, and two new transitions are created -- aka two new edges
-		// are defined.
+		// new beach section to insert falls in between two existing beach sections
+		// a new end point for one edge is defined, and two new edges are defined.
 		if (insertionPoint > 0 &&
 			this.equalWithEpsilon(site.x,this.rightBreakPoint(insertionPoint-1,site.y)) &&
 			this.equalWithEpsilon(site.x,this.leftBreakPoint(insertionPoint,site.y))) {
 
-			// before adding dddd:
-			//   arcs: aaaaaaaa bbbbbbbb cccccccc
-			//  edges:          ab       bc
-			//                  ^
-			// after adding dddd:
-			//   arcs: aaaaaaaa dddd bbbbbbbb cccccccc
-			//  edges:          ad   bd       bc
-			//                  ^
-			// transition ab disappears, meaning a new vertex is defined,
-			// while transition ad and bd appear, meaning two new edges are
-			// defined
+			// transition disappears, new vertex is defined,
+			// two new edges are defined
 			lArc = this.arcs[insertionPoint-1];
 			rArc = this.arcs[insertionPoint];
 
-			// invalidate circle events of left and right sites
+			// invalidate circle events
 			this.voidCircleEvents(insertionPoint-1,insertionPoint);
 
-			// an existing transition disappears, meaning a vertex is defined at the
-			// disappearance point
+			// transition disappears, a vertex is defined at the point
 			let circle = this.circumcircle(lArc.site,site,rArc.site);
 			this.setEdgeStartpoint(rArc.edge,lArc.site,rArc.site,new this.Vertex(circle.x,circle.y));
 
@@ -552,46 +409,27 @@ let Voronoi = {
 			// insert new beach section
 			this.arcs.splice(insertionPoint,0,newArc);
 
-			// check whether the left and right beach sections are collapsing
-			// and if so create circle events, to handle the point of collapse.
+			// check whether the beach sections are collapsing
 			this.addCircleEvents(insertionPoint-1,site.y);
 			this.addCircleEvents(insertionPoint+1,site.y);
 
 			return;
 			}
 
-		// case: this is the most-likely case, where an existing beach section
-		// is split by the new beach section to insert.
-		// adding a new beach section in the middle of an existing one causes two new
-		// transitions to appear -- but since both transitions involve the same two
-		// sites, only one single edge is created, and assigned to two beach front
-		// transitions (the 'edge' member of the beach section.)
-
 		// invalidate circle event possibly associated with the beach section
 		// to split
 		this.voidCircleEvents(insertionPoint);
-
-		// before:
-		//   arcs: aaaaaaaa bbbbbbbb cccccccc
-		//  edges:          ab       bc
-		// after:
-		//   arcs: aaaaaaaa bbbb dddd bbbb cccccccc
-		//  edges:          ab   bd   db   bc
-		//                        ^   ^
-		// bd & db are actually the same edge, the orientation has just
-		// not been decided yet
 
 		// insert new beach section into beachline
 		lArc = this.arcs[insertionPoint];
 		rArc = new this.Beachsection(lArc.site);
 		this.arcs.splice(insertionPoint+1,0,newArc,rArc);
 
-		// since we have a new transition between two beach sections,
-		// a new edge is born
+		// new transition between beach sections, a new edge is created
 		newArc.edge = rArc.edge = this.createEdge(lArc.site,newArc.site);
 
-		// check whether the left and right beach sections are collapsing
-		// and if so create circle events, to handle the point of collapse.
+		// check whether the beach sections are collapsing
+		// create circle events to handle the point of collapse.
 		this.addCircleEvents(insertionPoint,site.y);
 		this.addCircleEvents(insertionPoint+2,site.y);
 		},
@@ -617,8 +455,7 @@ let Voronoi = {
 		let lSite=this.arcs[iArc-1].site;
 		let cSite=this.arcs[iArc].site;
 		let rSite=this.arcs[iArc+1].site;
-		// if any two sites are repeated in the same beach section triplet,
-		// there can't be convergence
+		// any two sites repeated in the beach section cant converge
 		if (lSite.id==rSite.id || lSite.id==cSite.id || cSite.id==rSite.id) {return;}
 		// if points l->c->r are clockwise, then center beach section does not
 		// converge, hence it can't end up as a vertex
@@ -805,7 +642,6 @@ let Voronoi = {
 		if (!event) {return;}
 		this.sweep = event.y;
 		if ( event.type === this.SITE_EVENT ) {
-			//this.assert(this.cells[event.site.id] === undefined);
 			this.cells[event.site.id] = new this.Cell(event.site);
 			// add beach section
 			this.addArc(event.site);
@@ -814,7 +650,6 @@ let Voronoi = {
 			this.LARGEST_CIRCLE_QUEUE_SIZE = this.max(this.circEvents.length,this.LARGEST_CIRCLE_QUEUE_SIZE);
 			}
 		else {
-			//this.assert(event.type === this.CIRCLE_EVENT);
 			// remove beach section
 			this.removeArc(event);
 			}
@@ -896,7 +731,6 @@ let Voronoi = {
 
 		// special case: vertical line
 		if (f.m === undefined) {
-			//this.assert(lSite.x === rSite.x);
 			// doesn't intersect with viewport
 			if (f.x < xl || f.x >= xr) {return false;}
 			// downward
@@ -969,20 +803,14 @@ let Voronoi = {
 				}
 			}
 
-		//this.assert(va !== undefined && vb !== undefined);
 		edge.va = va;
 		edge.vb = vb;
 		return true;
 		},
 
-	// line-clipping code taken from:
-	// The Liang-Barsky line clipping algorithm in a nutshell!
-	// http://www.skytopia.com/project/articles/compsci/clipping.html
-	// Thanks!
-	// A bit modified to minimize code paths
+	// line-clipping
 	clipEdge: function(edge) {
 		// at this point no dangling edge is expected
-		//this.assert(edge.va !== undefined && edge.vb !== undefined);
 		let ax = edge.va.x;
 		let ay = edge.va.y;
 		let bx = edge.vb.x;
@@ -1085,8 +913,6 @@ let Voronoi = {
 		let halfedge;
 		for (let iHalfedge=0; iHalfedge<nHalfedges; iHalfedge++) {
 			halfedge = halfedges[iHalfedge];
-			//this.assert(halfedge.edge.va !== undefined && halfedge.edge.vb !== undefined);
-			//this.assert(!this.verticesAreEqual(halfedge.edge.va,halfedge.edge.vb));
 			}
 		},
 
@@ -1293,7 +1119,6 @@ let Voronoi = {
 		for (let cellid in cells) {
 			halfedges = cells[cellid].halfedges;
 			nHalfedges = halfedges.length;
-			//this.assert(nSegments > 0);
 			v = halfedges[0].getStartpoint();
 			ctx.beginPath();
 			ctx.moveTo(v.x,v.y);
@@ -1315,10 +1140,7 @@ let Voronoi = {
 		ctx.lineWidth = 1;
 		// sweep line is parabolas' directrix
 		let directrix = this.sweep;
-		// prime left cut coordinates, this way
-		// we have only one cut to compute for
-		// each arc as we walk through them from left
-		// to right
+		// prime left cut coordinates from left to right
 		let arc = this.arcs[0];
 		let xl = 0;
 		let yl, xr, yr;
@@ -1361,13 +1183,8 @@ let Voronoi = {
 			// degenerate case where the focus of the parabola is on the directrix
 			if (focy == directrix) {
 				xr = focx;
-				// since focus is on directrix, parabola is really a vertical line.
-				// the top endpoint of the vertical line can be found by computing
-				// the y value of the adajacent parabola on the left or right which
-				// is not also on the directrix.
-				// In the rare occurrence where no adjacent arcs are present,
-				// than the line is terminated by the top of the
-				// bounding box.
+				// focus is on directrix, parabola is a vertical line.
+				// If no adjacent arcs are there, line terminated by top of bounding box
 				neighbour = iArc>0 ? this.arcs[iArc-1] : null;
 				// neighbour is also a degenerate?
 				if (!neighbour || neighbour.site.y == directrix) {
@@ -1391,8 +1208,7 @@ let Voronoi = {
 				yl=yr;
 				continue;
 				}
-			// typical case, we need to find right cut point, oh and btw,
-			// no need to go beyond the viewport
+			// we need to find right cut point
 			xr = this.min(this.rightBreakPoint(iArc,directrix),cw);
 			p = (focy-directrix)/2;
 			yr = this.pow(xr-focx,2)/(4*p)+focy-p;
@@ -1400,11 +1216,7 @@ let Voronoi = {
 			if (xr >= 0 && xl < cw && xr > xl) {
 				// non-collapsing beach sections in green, collapsing ones in red
 				ctx.strokeStyle = arc.isCollapsing() ? '#800' : '#080';
-				// How to draw a parabola segment using canvas' quadraticCurveTo:
-				// http://alecmce.com/as3/parabolas-and-quadratic-bezier-curves
-				// Thanks!
-				// Of course, I was able to simplify code because here I only draw parabolas
-				// which are oriented vertically and always pointing up
+				// only draw parabolas oriented upward
 				ac_x = focx-xl;
 				ac_y = focy-directrix;
 				bc_x = focx-xr;
