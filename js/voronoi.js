@@ -1164,22 +1164,6 @@ let Voronoi = {
 			// site is parabola's focus
 			focx=arc.site.x;
 			focy=arc.site.y;
-			// draw circle event associated with the beach section
-			if ( arc.isCollapsing() ) {
-				let circEvent = arc.circleEvent;
-				ctx.save();
-				ctx.globalAlpha=0.25;
-				ctx.fillStyle='#800';
-				ctx.fillRect(circEvent.center.x-0.5,circEvent.center.y-0.5,2,2);
-				ctx.beginPath();
-				ctx.arc(circEvent.center.x,circEvent.center.y,circEvent.y-circEvent.center.y,0,pi_by_2,true);
-				ctx.strokeStyle='#aaa';
-				ctx.stroke();
-				ctx.fillStyle='#aaa';
-				ctx.beginPath();
-				ctx.fillRect(circEvent.x-0.5,circEvent.y-0.5,2,2);
-				ctx.restore();
-				}
 			// degenerate case where the focus of the parabola is on the directrix
 			if (focy == directrix) {
 				xr = focx;
