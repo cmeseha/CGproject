@@ -115,12 +115,13 @@ def circle(a, b, c):
 
 
 def addParabola(event):
+    print(event)
     point = event.point
     parabola = Parabola(point, event, None, None)
     parabola.pointsX = range(point[0] - 20, point[0] + 20)
     parabola.pointsY = parabola.parabolaD(point[0], point[1], point[1] - .5, x)
-
-    if root == None:
+    global root
+    if root is None:
         root = parabola
         return
 
@@ -216,10 +217,11 @@ def boundEdges():
 for site in points:
     # create a site event
     # heappush uses siteEvent.y so I added a y attribute
-    siteEvent = Vevent(site, True, site[1])
+    siteEvent = Vevent(site, True)
+    print(siteEvent)
 
     # insert site event into queue
-    heapq.heappush(queue, (siteEvent.y, siteEvent))
+    heapq.heappush(queue, (siteEvent.point[1], siteEvent))
     a.append(site[0])
     b.append(site[1])
 plotGraph(a, b)
@@ -227,6 +229,8 @@ plotGraph(a, b)
 while len(queue) != 0:
     heapq._heapify_max(queue)
     event = heapq._heappop_max(queue)
+    print("\n")
+    print(event)
     # beachLineParabX.clear()
     # beachLineParabY.clear()
 
