@@ -1113,7 +1113,7 @@ let Voronoi = {
 			// site is parabola's focus
 			focx=arc.site.x;
 			focy=arc.site.y;
-			// focus of the parabola is on the directrix
+      // focus of the parabola is on the directrix
 			if (focy == directrix) {
 				xr = focx;
 				// focus is on directrix, parabola is a vertical line.
