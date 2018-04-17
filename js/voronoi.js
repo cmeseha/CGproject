@@ -1085,7 +1085,7 @@ let Voronoi = {
 		ctx.globalAlpha = 1;
 		ctx.beginPath();
 		ctx.rect(0,0,this.canvas.width,this.canvas.height);
-		ctx.fillStyle = '#fff';
+		ctx.fillStyle = "white";
 		ctx.fill();
 		ctx.strokeStyle = '#888';
 		ctx.stroke();
@@ -1105,7 +1105,7 @@ let Voronoi = {
 				}
 			}
 		ctx.globalAlpha = 1;
-		ctx.fillStyle = '#000';
+		ctx.fillStyle ="red";
 		ctx.fill();
 		},
 
@@ -1164,6 +1164,7 @@ let Voronoi = {
 			// site is parabola's focus
 			focx=arc.site.x;
 			focy=arc.site.y;
+			
 			// degenerate case where the focus of the parabola is on the directrix
 			if (focy == directrix) {
 				xr = focx;
