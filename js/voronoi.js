@@ -13,7 +13,7 @@ let Voronoi = {
 	SITE_EVENT: 0,
 	CIRCLE_EVENT: 1,
 	VOID_EVENT: -1,
-	DEFAULT_NUM_SITES: 100,
+	DEFAULT_NUM_SITES: 0,
 	NUM_SITES_PROCESSED: 0,
 	BINARY_SEARCHES: 0,
 	BINARY_SEARCH_ITERATIONS: 0,
@@ -35,8 +35,6 @@ let Voronoi = {
 	pow: self.Math.pow,
 	PI: self.Math.PI,
 	isNaN: self.isNaN,
-	DEFAULT_CANVAS_WIDTH: 800,
-	DEFAULT_CANVAS_HEIGHT: 600,
 	canvas: null,
 	canvasMargin: 0,
 	bbox: {xl:0,xr:800,yt:0,yb:600},
@@ -1181,12 +1179,14 @@ let Voronoi = {
 
 	initCanvas: function() {
 		if (this.canvas) {return;}
-		let canvas = document.getElementById('voronoiCanvas');
+    
+		let canvas = document.getElementById('fortuneCanvas');
+    
 		if (!canvas.getContext) {return;}
 		let ctx = canvas.getContext('2d');
 		if (!ctx) {return;}
-		canvas.width = this.DEFAULT_CANVAS_WIDTH;
-		canvas.height = this.DEFAULT_CANVAS_HEIGHT;
+		canvas.width = 800;
+		canvas.height = 600;
 		ctx.fillStyle='#fff';
 		ctx.rect(0,0,canvas.width,canvas.height);
 		ctx.fill();
