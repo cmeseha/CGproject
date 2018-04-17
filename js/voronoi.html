@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <script type="text/javascript" src="voronoi.js"></script>
+		<style type="text/css">
+			h1 {
+				margin-top: 0px; 
+				margin: 0px; 
+				padding: 0px;
+			}
+			h2 {
+				margin-top: 0px; 
+				margin: 0px; 
+				padding: 0px;
+			}
+		</style>
+	</head>
+	<body onload="Voronoi.init();">
+		<h1>Fortune's algorithm </h1>
+		<h2>
+		<font size=3> Click "Generate Sites" to generate 20 random sites.
+		Then, click "Start" to begin the demo.</font></h2>
+		<div id="divroot" style="width:800px;">
+			<div class="divinfo" id="voronoiGenerator">
+				<input type="button" value="Generate Sites" onclick="Voronoi.clearSites();Voronoi.generateSites(20);"/>
+				<input id="voronoiAnimateSweepline" type="button" value="Start" onclick="VoronoiAnimate(4, 100);document.getElementById('voronoiAnimateSweeplineDelay').value=VoronoiAnimateDelay;"/>
+			</div>
+			<div id="canvasParent">
+				<br/>
+				<canvas id="voronoiCanvas" width="800" height="600"></canvas>
+			</div>
+		</div>
+	</body>
+</html>
