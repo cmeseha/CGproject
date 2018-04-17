@@ -455,15 +455,10 @@ let Voronoi = {
 		let rSite=this.arcs[iArc+1].site;
 		// any two sites repeated in the beach section cant converge
 		if (lSite.id==rSite.id || lSite.id==cSite.id || cSite.id==rSite.id) {return;}
-		// if points l->c->r are clockwise, then center beach section does not
-		// converge, hence it can't end up as a vertex
+		// if points l->c->r are clockwise, center beach section does not converge
 		if ((lSite.y-cSite.y)*(rSite.x-cSite.x)<=(lSite.x-cSite.x)*(rSite.y-cSite.y)) {return;}
 		// find circumscribed circle
 		let circle=this.circumcircle(lSite,cSite,rSite);
-		// not valid if the bottom-most point of the circumcircle
-		// is above the sweep line
-		// TODO: And what if it is on the sweep line, should it be discarded if it is
-		// *before* the last processed x value? Need to think about this.
 		let ybottom=circle.y+circle.radius;
 		if (!this.greaterThanOrEqualWithEpsilon(ybottom,sweep)) {return;}
 		let circEvent={
@@ -485,8 +480,6 @@ let Voronoi = {
 			let arc = this.arcs[iLeft];
 			if ( arc.circleEvent !== undefined ) {
 				arc.circleEvent.type = this.VOID_EVENT;
-				// after profiling in Chromium, found out assigning 'undefined' is much more efficient than
-				// using 'delete' on the property, possibly because 'delete' causes a 're-classify' to trigger
 				arc.circleEvent = undefined;
 				}
 			iLeft++;
@@ -510,23 +503,10 @@ let Voronoi = {
 
 	// get rid of void events from the circle events queue
 	queueSanitize: function() {
-		// ideally, the circle events queue should have *less*
-		// circle events as there are beach sections on the
-		// beachline -- all beach sections *cannot* be collapsing all at
-		// the same time.
-		// but void events other than at the end pile up and cause
-		// the finding of insertion point for new circle events to
-		// take longer and longer -- even though a binary search is used.
-		// to remedy this, a threshold is used to completely clean up
-		// the circle events queue from void events.
-		// currently, I arbitrarily set the treshold at more than twice
-		// the number of beach sections on the beachline.
-		// also, we want to splice from right to left to minimize the size
-		// of memory moves.
 		let q = this.circEvents;
 		let iRight = q.length;
 		if (!iRight) {return;}
-		// remove trailing void events only
+		// remove trailing events
 		let iLeft = iRight;
 		while (iLeft && q[iLeft-1].type === this.VOID_EVENT) {iLeft--;}
 		let nEvents = iRight-iLeft;
@@ -542,15 +522,13 @@ let Voronoi = {
 			// find a right-most void event
 			while (iRight>0 && q[iRight-1].type !== this.VOID_EVENT) {iRight--;}
 			if (iRight<=0) {break;}
-			// find a right-most non-void event immediately to the left of iRight
+			// find a right-most event to the left of iRight
 			iLeft = iRight-1;
 			while (iLeft>0 && q[iLeft-1].type === this.VOID_EVENT) {iLeft--;}
 			nEvents = iRight-iLeft;
 			this.NUM_VOID_EVENTS += nEvents;
 			q.splice(iLeft,nEvents);
-			// abort if queue has gotten small enough, this allow
-			// to avoid having to go through the whole array, most
-			// circle events are added toward the end of the queue
+			// abort if queue has gotten small enough
 			if (q.length < nArcs) {return;}
 			}
 		},
@@ -565,15 +543,15 @@ let Voronoi = {
 		// we will return a site or circle event
 		let siteEvent = this.siteEvents.length > 0 ? this.siteEvents[this.siteEvents.length-1] : null;
 		let circEvent = this.circEvents.length > 0 ? this.circEvents[this.circEvents.length-1] : null;
-		// if one and only one is null, the other is a valid event
+		// if one is null
 		if ( Boolean(siteEvent) !== Boolean(circEvent) ) {
 			return siteEvent ? siteEvent : circEvent;
 			}
-		// both queues are empty
+		// both null
 		if (!siteEvent) {
 			return null;
 			}
-		// both queues have valid events, return 'earliest'
+		// both valid, return earliest
 		if (siteEvent.y < circEvent.y || (siteEvent.y == circEvent.y && siteEvent.x < circEvent.x)) {
 			return siteEvent;
 			}
@@ -605,7 +583,7 @@ let Voronoi = {
 				if (!c) {c = o.x-q[i].x;}
 				if (c>0) {r = i;}
 				else if (c<0) {l = i+1;}
-				else {return; /*Duplicate sites not allowed, quietly ignored*/ }
+				else {return;}
 				}
 			q.splice(l,0,o);
 			}
@@ -651,7 +629,7 @@ let Voronoi = {
 			// remove beach section
 			this.removeArc(event);
 			}
-		// wrap-up: close all cells
+		// close all cells
 		if (this.queueIsEmpty()) {
 			this.closeCells();
 			}
@@ -680,7 +658,7 @@ let Voronoi = {
 			if (event.y > y) {break;}
 			this.processQueueOne();
 			}
-		// let's not go backward
+		// dont go backward
 		this.sweep = this.max(this.sweep,y);
 		// empty queue if sweep line is no longer visible
 		if (this.sweep > this.canvas.height) {
@@ -696,11 +674,9 @@ let Voronoi = {
 		return r;
 		},
 
-	// connect a dangling edge (not if a cursory test tells us
-	// it is not going to be visible.
-	// return value:
-	//   false: the dangling endpoint couldn't be connected
-	//   true: the dangling endpoint could be connected
+	// connect a dangling edge
+	// false: couldn't be connected
+	// true: could be connected
 	connectEdge: function(edge) {
 		let vb = edge.vb;
 		if (!!vb) {return true;}
@@ -710,26 +686,16 @@ let Voronoi = {
 		let yt = this.bbox.yt;
 		let yb = this.bbox.yb;
 
-		// get the line formula of the bisector
+		// get the line formula of bisector
 		let lSite = edge.lSite;
 		let rSite = edge.rSite;
 		let f = this.getBisector(lSite,rSite);
 
-		// remember, direction of line (relative to left site):
-		// upward: left.x < right.x
-		// downward: left.x > right.x
-		// horizontal: left.x == right.x
-		// upward: left.x < right.x
-		// rightward: left.y < right.y
-		// leftward: left.y > right.y
-		// vertical: left.y == right.y
+		// find the best side of the bounding box to use to determine start point
 
-		// depending on the direction, find the best side of the
-		// bounding box to use to determine a reasonable start point
-
-		// special case: vertical line
+		// vertical line
 		if (f.m === undefined) {
-			// doesn't intersect with viewport
+			// doesn't intersect
 			if (f.x < xl || f.x >= xr) {return false;}
 			// downward
 			if (lSite.x > rSite.x) {
@@ -752,8 +718,7 @@ let Voronoi = {
 				vb = new this.Vertex(f.x,yt);
 				}
 			}
-		// closer to horizontal than vertical, connect start point to the
-		// left or right side of the bounding box
+		// more horizontal
 		else if (f.m < 1) {
 			// rightward
 			if (lSite.y < rSite.y) {
@@ -776,8 +741,7 @@ let Voronoi = {
 				vb = new this.Vertex(xl,f.m*xl+f.b);
 				}
 			}
-		// closer to vertical than horizontal, connect start point to the
-		// top or bottom side of the bounding box
+		// more vertical
 		else {
 			// downward
 			if (lSite.x > rSite.x) {
@@ -808,7 +772,7 @@ let Voronoi = {
 
 	// line-clipping
 	clipEdge: function(edge) {
-		// at this point no dangling edge is expected
+		// no dangling edge
 		let ax = edge.va.x;
 		let ay = edge.va.y;
 		let bx = edge.vb.x;
@@ -865,7 +829,7 @@ let Voronoi = {
 			if (r<t0) {return false;}
 			else if (r<t1) {t1=r;}
 			}
-		// edge intersect, clip it
+		// clip edge intersect
 		edge.va.x = ax+t0*dx;
 		edge.va.y = ay+t0*dy;
 		edge.vb.x = ax+t1*dx;
@@ -873,15 +837,12 @@ let Voronoi = {
 		return true;
 		},
 
-	// coming soon, last part for the Voronoi diagram
-	// to be complete et usable.
 	clipEdges: function() {
-		// connect all dangling edges to bounding box
-		// or get rid of them if it can't be done
+		// connect all edges to bounding box
 		let edges = this.edges;
 		let nEdges = this.TOTAL_NUM_EDGES = edges.length;
 		let edge;
-		// iterate backward so we can splice safely and efficiently
+		// iterate backward to splice
 		for (let iEdge=nEdges-1; iEdge>=0; iEdge-=1) {
 			edge = edges[iEdge];
 			if (!this.connectEdge(edge) || !this.clipEdge(edge) || this.verticesAreEqual(edge.va,edge.vb)) {
@@ -896,7 +857,7 @@ let Voronoi = {
 		return this.equalWithEpsilon(a.x,b.x) && this.equalWithEpsilon(a.y,b.y);
 		},
 
-	// this function is used to sort halfedges counterclockwise
+	// sort halfedges counterclockwise
 	sortHalfedgesCallback: function(a,b) {
 		let ava = a.getStartpoint();
 		let avb = a.getEndpoint();
@@ -915,18 +876,15 @@ let Voronoi = {
 		},
 
 	// Close the cells.
-	// The cells are bound by the supplied bounding box.
-	// Each cell refers to its associated site, and a list
-	// of halfedges ordered counterclockwise.
 	closeCells: function() {
 		if (this.cellsClosed) {return;}
 		let xl = this.bbox.xl;
 		let xr = this.bbox.xr;
 		let yt = this.bbox.yt;
 		let yb = this.bbox.yb;
-		// clip edges to viewport
+		// clip edges
 		this.clipEdges();
-		// prune and order halfedges
+		// prune/order halfedges
 		let cells = this.cells;
 		let cell;
 		let iLeft, iRight;
@@ -938,7 +896,7 @@ let Voronoi = {
 			cell = cells[cellid];
 			halfedges = cell.halfedges;
 			iLeft = halfedges.length;
-			// get rid of unused halfedges
+			// remove unused halfedges
 			while (iLeft) {
 				iRight = iLeft;
 				while (iRight>0 && halfedges[iRight-1].isLineSegment()) {iRight--;}
@@ -947,44 +905,37 @@ let Voronoi = {
 				if (iLeft === iRight) {break;}
 				halfedges.splice(iLeft,iRight-iLeft);
 				}
-			// remove cell if it has zero halfedges
+			// remove cell if no halfedges
 			if (halfedges.length === 0) {
 				delete cells[cellid];
 				continue;
 				}
-			// reorder segments counterclockwise
+			// reorder segments
 			halfedges.sort(this.sortHalfedgesCallback);
 			// close open cells
-			// step 1: find first 'unclosed' point, if any.
-			// an 'unclosed' point will be the end point of a halfedge which
-			// does not match the start point of the following halfedge
 			nHalfedges = halfedges.length;
-			// special case: only one site, in which case, the viewport is the cell
-			// ...
-			// all other cases
 			iLeft = 0;
 			while (iLeft < nHalfedges) {
 				iRight = (iLeft+1) % nHalfedges;
 				endpoint = halfedges[iLeft].getEndpoint();
 				startpoint = halfedges[iRight].getStartpoint();
 				if (!this.verticesAreEqual(endpoint,startpoint)) {
-					// if we reach this point, cell needs to be closed by walking
-					// counterclockwise along the bounding box until it connects
+					// cell needs to be closed by moving counterclockwise along the bounding box until it connects
 					// to next halfedge in the list
 					va = new this.Vertex(endpoint.x,endpoint.y);
-					// walk downward along left side
+					// downward along left side
 					if (this.equalWithEpsilon(endpoint.x,xl) && this.lessThanWithEpsilon(endpoint.y,yb)) {
 						vb = new this.Vertex(xl,this.equalWithEpsilon(startpoint.x,xl) ? startpoint.y : yb);
 						}
-					// walk rightward along bottom side
+					// rightward along bottom side
 					else if (this.equalWithEpsilon(endpoint.y,yb) && this.lessThanWithEpsilon(endpoint.x,xr)) {
 						vb = new this.Vertex(this.equalWithEpsilon(startpoint.y,yb) ? startpoint.x : xr,yb);
 						}
-					// walk upward along right side
+					// upward along right side
 					else if (this.equalWithEpsilon(endpoint.x,xr) && this.greaterThanWithEpsilon(endpoint.y,yt)) {
 						vb = new this.Vertex(xr,this.equalWithEpsilon(startpoint.x,xr) ? startpoint.y : yt);
 						}
-					// walk leftward along top side
+					// leftward along top side
 					else if (this.equalWithEpsilon(endpoint.y,yt) && this.greaterThanWithEpsilon(endpoint.x,xl)) {
 						vb = new this.Vertex(this.equalWithEpsilon(startpoint.y,yt) ? startpoint.x : xl,yt);
 						}
@@ -1024,8 +975,6 @@ let Voronoi = {
 		let me = this;
 		canvas.onclick = function(e) {
 			if (!e) {e=self.event;}
-			// -----
-			// http://www.quirksmode.org/js/events_properties.html#position
 			let x = 0;
 			let y = 0;
 			if (e.pageX || e.pageY) {
@@ -1156,7 +1105,7 @@ let Voronoi = {
 			yl = (focx*focx)/(4*p)+focy-p;
 			}
 		// walk through all beach sections
-		let neighbour;
+		let neighbor;
 		let ac_x, ac_y, bc_x, bc_y, gx, gy, n;
 		let pi_by_2 = this.PI*2;
 		for (let iArc=0; iArc<nArcs; iArc++) {
@@ -1164,40 +1113,23 @@ let Voronoi = {
 			// site is parabola's focus
 			focx=arc.site.x;
 			focy=arc.site.y;
-			// draw circle event associated with the beach section
-			if ( arc.isCollapsing() ) {
-				let circEvent = arc.circleEvent;
-				ctx.save();
-				ctx.globalAlpha=0.25;
-				ctx.fillStyle='#800';
-				ctx.fillRect(circEvent.center.x-0.5,circEvent.center.y-0.5,2,2);
-				ctx.beginPath();
-				ctx.arc(circEvent.center.x,circEvent.center.y,circEvent.y-circEvent.center.y,0,pi_by_2,true);
-				ctx.strokeStyle='#aaa';
-				ctx.stroke();
-				ctx.fillStyle='#aaa';
-				ctx.beginPath();
-				ctx.fillRect(circEvent.x-0.5,circEvent.y-0.5,2,2);
-				ctx.restore();
-				}
-			// degenerate case where the focus of the parabola is on the directrix
+			// focus of the parabola is on the directrix
 			if (focy == directrix) {
 				xr = focx;
 				// focus is on directrix, parabola is a vertical line.
-				// If no adjacent arcs are there, line terminated by top of bounding box
-				neighbour = iArc>0 ? this.arcs[iArc-1] : null;
-				// neighbour is also a degenerate?
-				if (!neighbour || neighbour.site.y == directrix) {
-					neighbour = iArc < this.arcs.length-1 ? this.arcs[iArc+1] : null;
+				neighbor = iArc>0 ? this.arcs[iArc-1] : null;
+				// degenerate neighbor
+				if (!neighbor || neighbor.site.y == directrix) {
+					neighbor = iArc < this.arcs.length-1 ? this.arcs[iArc+1] : null;
 					}
-				// both neighbours are degenerate?
-				if (!neighbour || neighbour.site.y == directrix) {
+				// both degenerate neighbors
+				if (!neighbor || neighbor.site.y == directrix) {
 					yr = 0;
 					}
-				// found a nice neighbour, compute quadratic equation as usual
+				// nice neighbor
 				else {
-					p = (neighbour.site.y-directrix)/2;
-					yr = this.pow(focx-neighbour.site.x,2)/(4*p)+neighbour.site.y-p;
+					p = (neighbor.site.y-directrix)/2;
+					yr = this.pow(focx-neighbor.site.x,2)/(4*p)+neighbor.site.y-p;
 					}
 				ctx.strokeStyle = '#080';
 				ctx.beginPath();
@@ -1208,15 +1140,12 @@ let Voronoi = {
 				yl=yr;
 				continue;
 				}
-			// we need to find right cut point
+			// find right cut point
 			xr = this.min(this.rightBreakPoint(iArc,directrix),cw);
 			p = (focy-directrix)/2;
 			yr = this.pow(xr-focx,2)/(4*p)+focy-p;
-			// bother to draw only if beach section is within sight
+			// draw only if beach section within sight
 			if (xr >= 0 && xl < cw && xr > xl) {
-				// non-collapsing beach sections in green, collapsing ones in red
-				ctx.strokeStyle = arc.isCollapsing() ? '#800' : '#080';
-				// only draw parabolas oriented upward
 				ac_x = focx-xl;
 				ac_y = focy-directrix;
 				bc_x = focx-xr;
@@ -1265,7 +1194,7 @@ let Voronoi = {
 		let va, vb;
 		for (let iEdge=0; iEdge<nEdges; iEdge++) {
 			edge=this.edges[iEdge];
-			// skip dangling edges, they will be connected in some future
+			// skip dangling edges, they will be connected later
 			if (edge.va === undefined || edge.vb === undefined) {continue;}
 			va = edge.va;
 			vb = edge.vb;
