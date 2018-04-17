@@ -1034,7 +1034,7 @@ let Voronoi = {
 		ctx.globalAlpha = 1;
 		ctx.beginPath();
 		ctx.rect(0,0,this.canvas.width,this.canvas.height);
-		ctx.fillStyle = '#fff';
+		ctx.fillStyle = "white";
 		ctx.fill();
 		ctx.strokeStyle = '#888';
 		ctx.stroke();
@@ -1054,7 +1054,7 @@ let Voronoi = {
 				}
 			}
 		ctx.globalAlpha = 1;
-		ctx.fillStyle = '#000';
+		ctx.fillStyle ="red";
 		ctx.fill();
 		},
 
