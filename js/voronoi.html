@@ -4,61 +4,22 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<title>Fortune's algorithm</title>
         <script type="text/javascript" src="voronoi.js"></script>
-		<style type="text/css">
-			body {font-family:tahoma,verdana,arial;font-size:13px;margin:0;padding:0}
-			body > div {margin-left:4px;margin-right:4px;}
-			body > div > div {margin:0;border:1px solid #ccc;border-top:0;padding:4px;}
-			h1 {margin:0 0 0.5em 0;padding: 4px 5em 4px 4px;font:bold large sans-serif;background-color:#c9d7f1;}
-			h4 {font-size:14px;margin:0.5em 0 0 0;border:0;border-bottom:solid 1px #c9d7f1;padding:2px;background-color:#e5ecf9;}
-			h4 > span {cursor:pointer}
-			textarea {font-size:11px;color:gray}
-			table {padding:0;border:1px solid #eee}
-			table tr:first-child {background-color:#e4f4e4;font-weight:bold;}
-			table tr:first-child ~ tr:nth-child(odd) {background-color:#f4f4f4}
-			table td {margin:0;padding:2px;border:0;vertical-align:top;background-color:transparent;}
-			#canvasParent {margin-top:0;margin-bottom:1em;padding:0;border:0}
-		</style>
 	</head>
 	<body onload="Voronoi.init();">
-		<h1>Javascript Fortune's algorithm</h1>
+		<h1>Fortune's algorithm</h1>
+		<h2>Click "Generate Sites" to generate 20 random sites. </br>
+		Then, click "Start" to begin the demo.</h2>
 		<div id="divroot" style="width:800px;">
-			<h4 class="divhdr">Sites generator <span id="voronoiGeneratorCollapse">&#9653;</span></h4>
 			<div class="divinfo" id="voronoiGenerator">
-				<input type="button" value="Generate" onclick="Voronoi.clearSites();Voronoi.generateSites(parseInt(document.getElementById('voronoiNumberSites').value,10));"/> or <input type="button" value="Add" onclick="Voronoi.generateSites(parseInt(document.getElementById('voronoiNumberSites').value,10));"/><input id="voronoiNumberSites" type="text" value="100" size="5" maxlength="5"/>
-				<br/>
-				<input id="voronoiClearSites" type="button" value="Clear all sites" onclick="Voronoi.clearSites();"/>
-			</div>
-			<h4 class="divhdr">Canvas <span id="voronoiCanvasControlsCollapse">&#9653;</span></h4>
-			<div id="voronoiCanvasControls">
-				<div style="width:80%;margin:0;border:0;display:inline-block;vertical-align:top;">
-					<input id="voronoiCanvasSize" type="button" value="Set" onclick="Voronoi.setCanvasSize(parseInt(document.getElementById('voronoiWidth').value,10),parseInt(document.getElementById('voronoiHeight').value,10));Voronoi.setCanvasMargin(parseInt(document.getElementById('voronoiCanvasMargin').value,10));document.getElementById('divroot').style.width=String(Math.max(Voronoi.canvas.width,800))+'px'"/> canvas W &times; H to <input id="voronoiWidth" type="text" value="800" size="4" maxlength="4" /> pixels &times; <input id="voronoiHeight" type="text" value="600" size="4" maxlength="4" /> pixels, with a margin of <input id="voronoiCanvasMargin" type="text" value="0" size="2" maxlength="2" /> pixels.
-				</div>
+				<input type="button" value="Generate Sites" onclick="Voronoi.clearSites();Voronoi.generateSites(20);"/>
+				<input id="voronoiAnimateSweepline" type="button" value="Start" onclick="VoronoiAnimate(4, 100);document.getElementById('voronoiAnimateSweeplineDelay').value=VoronoiAnimateDelay;"/>
+				<input id="voronoiClearSites" type="button" value="Clear Canvas" onclick="Voronoi.clearSites();"/>
 			</div>
 			<div id="canvasParent">
-				<canvas id="voronoiCanvas" style="cursor:crosshair" width="800" height="600"></canvas>
-			</div>
-			<h4 class="divhdr">Event queue</h4>
-			<div class="divinfo">
-				<div style="width:49%;margin:0;border:0;display:inline-block;vertical-align:top">
-					<input id="voronoiMoveSweepline" type="button" value="Move sweep line" onclick="Voronoi.processUpTo(Voronoi.sweep+parseInt(document.getElementById('voronoiMoveSweeplineN').value,10));Voronoi.draw();Voronoi.dumpBeachline();"/> <input id="voronoiMoveSweeplineN" type="text" value="4" size="3" maxlength="3"/> pixel(s)<br/>
-					<input id="voronoiAnimateSweepline" type="button" value="Move sweep line" onclick="VoronoiAnimate(parseInt(document.getElementById('voronoiMoveSweeplineN').value,10),parseInt(document.getElementById('voronoiAnimateSweeplineDelay').value,10));document.getElementById('voronoiAnimateSweeplineDelay').value=VoronoiAnimateDelay;"/> every <input id="voronoiAnimateSweeplineDelay" type="text" value="100" size="4" maxlength="4"/> ms <input id="voronoiAnimateSweeplineStop" type="button" value="Stop" onclick="VoronoiAnimateStop();"/><br/>
-				</div>
+				<canvas id="voronoiCanvas" width="800" height="600"></canvas>
 			</div>
 		</div>
 		<script type="text/javascript">
-			(function(){
-				var els=document.querySelectorAll('h4 > span');
-				for (var i=0; i<els.length; i++){
-					var el=els[i];
-					el.onclick=function(){
-						var id=this.id.replace('Collapse','');
-						var div=document.getElementById(id);
-						var expanded=div.style.display=='';
-						div.style.display=expanded?'none':'';
-						this.innerHTML=expanded?'&#9663;':'&#9653;';
-					};
-				}
-			})();
 		</script>
 	</body>
 </html>
