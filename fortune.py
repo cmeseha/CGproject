@@ -62,7 +62,7 @@ while (len(queue) != 0):
         #addParabola(event.point)
     else:
         #removeParabola(event.arch)
-        print("shit")
+        print("something")
     #update beach line (all other parabolas)
     for site in beachLineSites: 
         x = range(site[0]-20, site[0] + 20)
