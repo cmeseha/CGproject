@@ -1,6 +1,6 @@
 /*global self */
 
-var Voronoi = {
+let Voronoi = {
 	//
 	// Properties
 	//
@@ -105,22 +105,22 @@ var Voronoi = {
 			// maybe can still be improved, will see if any
 			// more of this kind of errors pop up again
 			this.PARENT.PARABOLIC_CUT_CALCS++;
-			var rfocx = site.x;
-			var rfocy = site.y;
+			let rfocx = site.x;
+			let rfocy = site.y;
 			// parabola in degenerate case where focus is on directrix
 			if (rfocy == directrix) {return rfocx;}
-			var lfocx = left.x;
-			var lfocy = left.y;
+			let lfocx = left.x;
+			let lfocy = left.y;
 			// parabola in degenerate case where focus is on directrix
 			if (lfocy == directrix) {return lfocx;}
 			// both parabolas have same distance to directrix, thus break point is midway
 			if (rfocy == lfocy) {return (rfocx+lfocx)/2;}
 			// calculate break point the normal way
-			var pby2 = rfocy-directrix;
-			var plby2 = lfocy-directrix;
-			var hl = lfocx-rfocx;
-			var aby2 = 1/pby2-1/plby2;
-			var b = hl/plby2;
+			let pby2 = rfocy-directrix;
+			let plby2 = lfocy-directrix;
+			let hl = lfocx-rfocx;
+			let aby2 = 1/pby2-1/plby2;
+			let b = hl/plby2;
 			return (-b+this.sqrt(b*b-2*aby2*(hl*hl/(-2*plby2)-lfocy+plby2/2+rfocy-pby2/2)))/aby2+rfocx;
 			};
 		// higher level method which caches result and attempt to reuse it
@@ -196,21 +196,21 @@ var Voronoi = {
 		},
 
 	randomSites: function(n) {
-		var margin = this.canvasMargin;
-		var xo = this.bbox.xl+margin;
-		var dx = this.bbox.xr-margin*2;
-		var yo = this.bbox.yt+margin;
-		var dy = this.bbox.yb-margin*2;
-		for (var i=0; i<n; i++) {
+		let margin = this.canvasMargin;
+		let xo = this.bbox.xl+margin;
+		let dx = this.bbox.xr-margin*2;
+		let yo = this.bbox.yt+margin;
+		let dy = this.bbox.yb-margin*2;
+		for (let i=0; i<n; i++) {
 			this.sites.push(new this.Site(this.round(xo+this.random()*dx),this.round(yo+this.random()*dy)));
 			}
 		},
 
 	parseSites: function(s) {
 		// split string into values, eliminate all NaNs
-		var values=s.split(/[^0-9-.+e]+/);
-		var nValues=values.length;
-		var iValue=0;
+		let values=s.split(/[^0-9-.+e]+/);
+		let nValues=values.length;
+		let iValue=0;
 		while (iValue<nValues) {
 			if (this.isNaN(parseFloat(values[iValue]))) {
 				values.splice(iValue,1);
@@ -221,9 +221,9 @@ var Voronoi = {
 				}
 			}
 		// number of x,y pairs
-		var nPairs = values.length & 0xfffe;
-		var x; var y;
-		for (var iPair=0; iPair<nPairs; iPair+=2) {
+		let nPairs = values.length & 0xfffe;
+		let x; let y;
+		for (let iPair=0; iPair<nPairs; iPair+=2) {
 			x = parseFloat(values[iPair]);
 			y = parseFloat(values[iPair+1]);
 			if (!this.isNaN(x) && !this.isNaN(y)) {
@@ -236,9 +236,9 @@ var Voronoi = {
 
 	parseLattices: function(s) {
 		// split string into values, eliminate all NaNs
-		var values = s.split(/[^0-9-.+e]+/);
-		var nValues = values.length;
-		var iValue = 0;
+		let values = s.split(/[^0-9-.+e]+/);
+		let nValues = values.length;
+		let iValue = 0;
 		while (iValue < nValues) {
 			if (this.isNaN(self.parseFloat(values[iValue]))) {
 				values.splice(iValue,1);
@@ -249,19 +249,19 @@ var Voronoi = {
 				}
 			}
 		// number of quadruplets
-		var nQuads = values.length & 0xfffc;
-		var w = this.canvas.width;
-		var h = this.canvas.height;
-		var offx; var offy;
-		var dx; var dy;
-		for (var iQuad=0; iQuad<nQuads; iQuad+=4) {
+		let nQuads = values.length & 0xfffc;
+		let w = this.canvas.width;
+		let h = this.canvas.height;
+		let offx; let offy;
+		let dx; let dy;
+		for (let iQuad=0; iQuad<nQuads; iQuad+=4) {
 			offx = self.parseFloat(values[iQuad]);
 			offy = self.parseFloat(values[iQuad+1]);
 			dx = self.parseFloat(values[iQuad+2]);
 			dy = self.parseFloat(values[iQuad+3]);
 			if (!this.isNaN(offx) && !this.isNaN(offy) && !this.isNaN(dx) && !this.isNaN(dy)) {
-				for (var y=offy; y<(h+dy); y+=dy) {
-					for (var x=offx; x<=(w+dx); x+=dx) {
+				for (let y=offy; y<(h+dy); y+=dy) {
+					for (let x=offx; x<=(w+dx); x+=dx) {
 						this.sites.push(new this.Site(x,y));
 						}
 					}
@@ -289,15 +289,14 @@ var Voronoi = {
 		this.NUM_DESTROYED_EDGES = 0;
 		this.cellsClosed = false;
 		this.queueInit();
-		this.dumpBeachline();
 		this.draw();
 		},
 
 	// calculate the left break point of a particular beach section,
 	// given a particular sweep line
 	leftBreakPoint: function(iarc, sweep) {
-		var arc = this.arcs[iarc];
-		var site = arc.site;
+		let arc = this.arcs[iarc];
+		let site = arc.site;
 		if (site.y == sweep) {return site.x;}
 		if (iarc === 0) {return -Infinity;}
 		return arc.leftParabolicCut(this.arcs[iarc-1].site,sweep);
@@ -309,7 +308,7 @@ var Voronoi = {
 		if (iarc < this.arcs.length-1) {
 			return this.leftBreakPoint(iarc+1,sweep);
 			}
-		var site = this.arcs[iarc].site;
+		let site = this.arcs[iarc].site;
 		return site.y == sweep ? site.x : Infinity;
 		},
 
@@ -325,11 +324,11 @@ var Voronoi = {
 	// section
 	findInsertionPoint: function(x, sweep) {
 		this.BINARY_SEARCHES++;
-		var n = this.arcs.length;
+		let n = this.arcs.length;
 		if (!n) { return 0; }
-		var l = 0;
-		var r = n;
-		var i;
+		let l = 0;
+		let r = n;
+		let i;
 		while (l<r) {
 			this.BINARY_SEARCH_ITERATIONS++;
 			i = (l+r)>>1;
@@ -350,12 +349,12 @@ var Voronoi = {
 	// INFO: Chromium profiling shows this a hot spot
 	findDeletionPoint: function(x, sweep) {
 		this.BINARY_SEARCHES++;
-		var n = this.arcs.length;
+		let n = this.arcs.length;
 		if (!n) { return 0; }
-		var l = 0;
-		var r = n;
-		var i;
-		var xcut;
+		let l = 0;
+		let r = n;
+		let i;
+		let xcut;
 		while (l<r) {
 			this.BINARY_SEARCH_ITERATIONS++;
 			i = (l+r)>>1;
@@ -386,7 +385,7 @@ var Voronoi = {
 	// two halfedges which are added to each site's counterclockwise array
 	// of halfedges.
 	createEdge: function(lSite,rSite,va,vb) {
-		var edge = new this.Edge(lSite,rSite);
+		let edge = new this.Edge(lSite,rSite);
 		this.edges.push(edge);
 		//this.assert(this.cells[lSite.id] != undefined);
 		//this.assert(this.cells[rSite.id] != undefined);
@@ -402,7 +401,7 @@ var Voronoi = {
 		},
 
 	createBorderEdge: function(lSite,va,vb) {
-		var edge = new this.Edge(lSite,null);
+		let edge = new this.Edge(lSite,null);
 		edge.va = va;
 		edge.vb = vb;
 		this.edges.push(edge);
@@ -439,29 +438,29 @@ var Voronoi = {
 		},
 
 	removeArc: function(event) {
-		var x = event.center.x;
-		var y = event.center.y;
-		var sweep = event.y;
-		var deletionPoint = this.findDeletionPoint(x, sweep);
+		let x = event.center.x;
+		let y = event.center.y;
+		let sweep = event.y;
+		let deletionPoint = this.findDeletionPoint(x, sweep);
 		// there could be more than one empty arc at the deletion point, this
 		// happens when more than two edges are linked by the same vertex,
 		// so we will collect all those edges by looking up both sides of
 		// the deletion point
 		// look left
-		var iLeft = deletionPoint;
+		let iLeft = deletionPoint;
 		while (iLeft-1 > 0 && this.equalWithEpsilon(x,this.leftBreakPoint(iLeft-1,sweep)) ) {
 			iLeft--;
 			}
 		// look right
-		var iRight = deletionPoint;
+		let iRight = deletionPoint;
 		while (iRight+1 < this.arcs.length && this.equalWithEpsilon(x,this.rightBreakPoint(iRight+1,sweep)) ) {
 			iRight++;
 			}
 
 		// walk through all the collapsed beach sections and set the start point
 		// of their left edge
-		var lArc, rArc;
-		for (var iArc=iLeft; iArc<=iRight+1; iArc++) {
+		let lArc, rArc;
+		for (let iArc=iLeft; iArc<=iRight+1; iArc++) {
 			lArc = this.arcs[iArc-1];
 			rArc = this.arcs[iArc];
 			this.setEdgeStartpoint(rArc.edge,lArc.site,rArc.site,new this.Vertex(x,y));
@@ -488,8 +487,8 @@ var Voronoi = {
 
 	addArc: function(site) {
 		// find insertion point of new beach section on the beachline
-		var newArc = new this.Beachsection(site);
-		var insertionPoint = this.findInsertionPoint(site.x,site.y);
+		let newArc = new this.Beachsection(site);
+		let insertionPoint = this.findInsertionPoint(site.x,site.y);
 
 		// case: insert as last beach section, this case can happen only
 		// when *all* previously processed sites have exactly the same
@@ -512,7 +511,7 @@ var Voronoi = {
 			return;
 			}
 
-		var lArc, rArc;
+		let lArc, rArc;
 
 		// case: new beach section to insert falls exactly
 		// in between two existing beach sections:
@@ -543,7 +542,7 @@ var Voronoi = {
 
 			// an existing transition disappears, meaning a vertex is defined at the
 			// disappearance point
-			var circle = this.circumcircle(lArc.site,site,rArc.site);
+			let circle = this.circumcircle(lArc.site,site,rArc.site);
 			this.setEdgeStartpoint(rArc.edge,lArc.site,rArc.site,new this.Vertex(circle.x,circle.y));
 
 			// two new transitions appear at the new vertex location
@@ -598,26 +597,26 @@ var Voronoi = {
 		},
 
 	circumcircle: function(a,b,c) {
-		var ax=a.x;
-		var ay=a.y;
-		var bx=b.x-ax;
-		var by=b.y-ay;
-		var cx=c.x-ax;
-		var cy=c.y-ay;
-		var d=2*(bx*cy-by*cx);
-		var hb=bx*bx+by*by;
-		var hc=cx*cx+cy*cy;
-		var x=(cy*hb-by*hc)/d;
-		var y=(bx*hc-cx*hb)/d;
+		let ax=a.x;
+		let ay=a.y;
+		let bx=b.x-ax;
+		let by=b.y-ay;
+		let cx=c.x-ax;
+		let cy=c.y-ay;
+		let d=2*(bx*cy-by*cx);
+		let hb=bx*bx+by*by;
+		let hc=cx*cx+cy*cy;
+		let x=(cy*hb-by*hc)/d;
+		let y=(bx*hc-cx*hb)/d;
 		return {x:x+ax,y:y+ay,radius:this.sqrt(x*x+y*y)};
 		},
 
 	addCircleEvents: function(iArc,sweep) {
 		if (iArc <= 0 || iArc >= this.arcs.length-1) {return;}
-		var arc=this.arcs[iArc];
-		var lSite=this.arcs[iArc-1].site;
-		var cSite=this.arcs[iArc].site;
-		var rSite=this.arcs[iArc+1].site;
+		let arc=this.arcs[iArc];
+		let lSite=this.arcs[iArc-1].site;
+		let cSite=this.arcs[iArc].site;
+		let rSite=this.arcs[iArc+1].site;
 		// if any two sites are repeated in the same beach section triplet,
 		// there can't be convergence
 		if (lSite.id==rSite.id || lSite.id==cSite.id || cSite.id==rSite.id) {return;}
@@ -625,14 +624,14 @@ var Voronoi = {
 		// converge, hence it can't end up as a vertex
 		if ((lSite.y-cSite.y)*(rSite.x-cSite.x)<=(lSite.x-cSite.x)*(rSite.y-cSite.y)) {return;}
 		// find circumscribed circle
-		var circle=this.circumcircle(lSite,cSite,rSite);
+		let circle=this.circumcircle(lSite,cSite,rSite);
 		// not valid if the bottom-most point of the circumcircle
 		// is above the sweep line
 		// TODO: And what if it is on the sweep line, should it be discarded if it is
 		// *before* the last processed x value? Need to think about this.
-		var ybottom=circle.y+circle.radius;
+		let ybottom=circle.y+circle.radius;
 		if (!this.greaterThanOrEqualWithEpsilon(ybottom,sweep)) {return;}
-		var circEvent={
+		let circEvent={
 			type: this.CIRCLE_EVENT,
 			site: cSite,
 			x: circle.x,
@@ -648,7 +647,7 @@ var Voronoi = {
 		iLeft = this.max(iLeft,0);
 		iRight = this.min(iRight,this.arcs.length-1);
 		while (iLeft <= iRight) {
-			var arc = this.arcs[iLeft];
+			let arc = this.arcs[iLeft];
 			if ( arc.circleEvent !== undefined ) {
 				arc.circleEvent.type = this.VOID_EVENT;
 				// after profiling in Chromium, found out assigning 'undefined' is much more efficient than
@@ -662,9 +661,9 @@ var Voronoi = {
 	queueInit: function() {
 		this.sweep = 0;
 		this.siteEvents = [];
-		var n = this.sites.length;
-		for (var i=0; i<n; i++) {
-			var site = this.sites[i];
+		let n = this.sites.length;
+		for (let i=0; i<n; i++) {
+			let site = this.sites[i];
 			this.queuePushSite({type:this.SITE_EVENT, x:site.x, y:site.y, site:site});
 			}
 		this.NUM_SITES_PROCESSED = this.siteEvents.length;
@@ -689,19 +688,19 @@ var Voronoi = {
 		// the number of beach sections on the beachline.
 		// also, we want to splice from right to left to minimize the size
 		// of memory moves.
-		var q = this.circEvents;
-		var iRight = q.length;
+		let q = this.circEvents;
+		let iRight = q.length;
 		if (!iRight) {return;}
 		// remove trailing void events only
-		var iLeft = iRight;
+		let iLeft = iRight;
 		while (iLeft && q[iLeft-1].type === this.VOID_EVENT) {iLeft--;}
-		var nEvents = iRight-iLeft;
+		let nEvents = iRight-iLeft;
 		if (nEvents) {
 			this.NUM_VOID_EVENTS += nEvents;
 			q.splice(iLeft,nEvents);
 			}
 		// remove all void events if queue grew too large
-		var nArcs = this.arcs.length;
+		let nArcs = this.arcs.length;
 		if (q.length < nArcs*2) {return;}
 		while (true) {
 			iRight = iLeft-1;
@@ -729,8 +728,8 @@ var Voronoi = {
 	queuePeek: function() {
 		this.queueSanitize();
 		// we will return a site or circle event
-		var siteEvent = this.siteEvents.length > 0 ? this.siteEvents[this.siteEvents.length-1] : null;
-		var circEvent = this.circEvents.length > 0 ? this.circEvents[this.circEvents.length-1] : null;
+		let siteEvent = this.siteEvents.length > 0 ? this.siteEvents[this.siteEvents.length-1] : null;
+		let circEvent = this.circEvents.length > 0 ? this.circEvents[this.circEvents.length-1] : null;
 		// if one and only one is null, the other is a valid event
 		if ( Boolean(siteEvent) !== Boolean(circEvent) ) {
 			return siteEvent ? siteEvent : circEvent;
@@ -747,7 +746,7 @@ var Voronoi = {
 		},
 
 	queuePop: function() {
-		var event = this.queuePeek();
+		let event = this.queuePeek();
 		if (event) {
 			if (event.type === this.SITE_EVENT) {
 				this.siteEvents.pop();
@@ -760,11 +759,11 @@ var Voronoi = {
 		},
 
 	queuePushSite: function(o) {
-		var q = this.siteEvents;
-		var r = q.length;
+		let q = this.siteEvents;
+		let r = q.length;
 		if (r) {
-			var l = 0;
-			var i, c;
+			let l = 0;
+			let i, c;
 			while (l<r) {
 				i = (l+r)>>1;
 				c = o.y-q[i].y;
@@ -782,11 +781,11 @@ var Voronoi = {
 
 	queuePushCircle: function(o) {
 		this.NUM_CIRCLE_EVENTS++;
-		var q = this.circEvents;
-		var r = q.length;
+		let q = this.circEvents;
+		let r = q.length;
 		if (r) {
-			var l = 0;
-			var i, c;
+			let l = 0;
+			let i, c;
 			while (l<r) {
 				i = (l+r)>>1;
 				c = o.y-q[i].y;
@@ -802,7 +801,7 @@ var Voronoi = {
 		},
 
 	processQueueOne: function() {
-		var event = this.queuePop();
+		let event = this.queuePop();
 		if (!event) {return;}
 		this.sweep = event.y;
 		if ( event.type === this.SITE_EVENT ) {
@@ -838,12 +837,11 @@ var Voronoi = {
 	processQueueAll: function() {
 		this.processQueueN(999999999);
 		this.sweep = this.max(this.sweep,this.canvas.height);
-		this.dumpBeachline();
 		this.draw();
 		},
 
 	processUpTo: function(y) {
-		var event;
+		let event;
 		while (!this.queueIsEmpty()) {
 			event = this.queuePeek();
 			if (event.y > y) {break;}
@@ -858,7 +856,7 @@ var Voronoi = {
 		},
 
 	getBisector: function(va,vb) {
-		var r = {x:(va.x+vb.x)/2,y:(va.y+vb.y)/2};
+		let r = {x:(va.x+vb.x)/2,y:(va.y+vb.y)/2};
 		if (vb.y==va.y) {return r;}
 		r.m = (va.x-vb.x)/(vb.y-va.y);
 		r.b = r.y-r.m*r.x;
@@ -871,18 +869,18 @@ var Voronoi = {
 	//   false: the dangling endpoint couldn't be connected
 	//   true: the dangling endpoint could be connected
 	connectEdge: function(edge) {
-		var vb = edge.vb;
+		let vb = edge.vb;
 		if (!!vb) {return true;}
-		var va = edge.va;
-		var xl = this.bbox.xl;
-		var xr = this.bbox.xr;
-		var yt = this.bbox.yt;
-		var yb = this.bbox.yb;
+		let va = edge.va;
+		let xl = this.bbox.xl;
+		let xr = this.bbox.xr;
+		let yt = this.bbox.yt;
+		let yb = this.bbox.yb;
 
 		// get the line formula of the bisector
-		var lSite = edge.lSite;
-		var rSite = edge.rSite;
-		var f = this.getBisector(lSite,rSite);
+		let lSite = edge.lSite;
+		let rSite = edge.rSite;
+		let f = this.getBisector(lSite,rSite);
 
 		// remember, direction of line (relative to left site):
 		// upward: left.x < right.x
@@ -985,18 +983,18 @@ var Voronoi = {
 	clipEdge: function(edge) {
 		// at this point no dangling edge is expected
 		//this.assert(edge.va !== undefined && edge.vb !== undefined);
-		var ax = edge.va.x;
-		var ay = edge.va.y;
-		var bx = edge.vb.x;
-		var by = edge.vb.y;
-		var t0 = 0;
-		var t1 = 1;
-		var dx = bx-ax;
-		var dy = by-ay;
+		let ax = edge.va.x;
+		let ay = edge.va.y;
+		let bx = edge.vb.x;
+		let by = edge.vb.y;
+		let t0 = 0;
+		let t1 = 1;
+		let dx = bx-ax;
+		let dy = by-ay;
 		// left
-		var q = ax-this.bbox.xl;
+		let q = ax-this.bbox.xl;
 		if (dx===0 && q<0) {return false;}
-		var r = -q/dx;
+		let r = -q/dx;
 		if (dx<0) {
 			if (r<t0) {return false;}
 			else if (r<t1) {t1=r;}
@@ -1054,11 +1052,11 @@ var Voronoi = {
 	clipEdges: function() {
 		// connect all dangling edges to bounding box
 		// or get rid of them if it can't be done
-		var edges = this.edges;
-		var nEdges = this.TOTAL_NUM_EDGES = edges.length;
-		var edge;
+		let edges = this.edges;
+		let nEdges = this.TOTAL_NUM_EDGES = edges.length;
+		let edge;
 		// iterate backward so we can splice safely and efficiently
-		for (var iEdge=nEdges-1; iEdge>=0; iEdge-=1) {
+		for (let iEdge=nEdges-1; iEdge>=0; iEdge-=1) {
 			edge = edges[iEdge];
 			if (!this.connectEdge(edge) || !this.clipEdge(edge) || this.verticesAreEqual(edge.va,edge.vb)) {
 				this.NUM_DESTROYED_EDGES++;
@@ -1074,18 +1072,18 @@ var Voronoi = {
 
 	// this function is used to sort halfedges counterclockwise
 	sortHalfedgesCallback: function(a,b) {
-		var ava = a.getStartpoint();
-		var avb = a.getEndpoint();
-		var bva = b.getStartpoint();
-		var bvb = b.getEndpoint();
+		let ava = a.getStartpoint();
+		let avb = a.getEndpoint();
+		let bva = b.getStartpoint();
+		let bvb = b.getEndpoint();
 		return self.Math.atan2(bvb.y-bva.y,bvb.x-bva.x) - self.Math.atan2(avb.y-ava.y,avb.x-ava.x);
 		},
 
 	validateCells: function(cell) {
-		var halfedges = cell.halfedges;
-		var nHalfedges = halfedges.length;
-		var halfedge;
-		for (var iHalfedge=0; iHalfedge<nHalfedges; iHalfedge++) {
+		let halfedges = cell.halfedges;
+		let nHalfedges = halfedges.length;
+		let halfedge;
+		for (let iHalfedge=0; iHalfedge<nHalfedges; iHalfedge++) {
 			halfedge = halfedges[iHalfedge];
 			//this.assert(halfedge.edge.va !== undefined && halfedge.edge.vb !== undefined);
 			//this.assert(!this.verticesAreEqual(halfedge.edge.va,halfedge.edge.vb));
@@ -1098,21 +1096,21 @@ var Voronoi = {
 	// of halfedges ordered counterclockwise.
 	closeCells: function() {
 		if (this.cellsClosed) {return;}
-		var xl = this.bbox.xl;
-		var xr = this.bbox.xr;
-		var yt = this.bbox.yt;
-		var yb = this.bbox.yb;
+		let xl = this.bbox.xl;
+		let xr = this.bbox.xr;
+		let yt = this.bbox.yt;
+		let yb = this.bbox.yb;
 		// clip edges to viewport
 		this.clipEdges();
 		// prune and order halfedges
-		var cells = this.cells;
-		var cell;
-		var iLeft, iRight;
-		var halfedges, nHalfedges;
-		var edge;
-		var startpoint, endpoint;
-		var va, vb;
-		for (var cellid in cells) {
+		let cells = this.cells;
+		let cell;
+		let iLeft, iRight;
+		let halfedges, nHalfedges;
+		let edge;
+		let startpoint, endpoint;
+		let va, vb;
+		for (let cellid in cells) {
 			cell = cells[cellid];
 			halfedges = cell.halfedges;
 			iLeft = halfedges.length;
@@ -1183,9 +1181,9 @@ var Voronoi = {
 
 	initCanvas: function() {
 		if (this.canvas) {return;}
-		var canvas = document.getElementById('voronoiCanvas');
+		let canvas = document.getElementById('voronoiCanvas');
 		if (!canvas.getContext) {return;}
-		var ctx = canvas.getContext('2d');
+		let ctx = canvas.getContext('2d');
 		if (!ctx) {return;}
 		canvas.width = this.DEFAULT_CANVAS_WIDTH;
 		canvas.height = this.DEFAULT_CANVAS_HEIGHT;
@@ -1197,13 +1195,13 @@ var Voronoi = {
 		this.canvas = canvas;
 
 		// event handlers
-		var me = this;
+		let me = this;
 		canvas.onclick = function(e) {
 			if (!e) {e=self.event;}
 			// -----
 			// http://www.quirksmode.org/js/events_properties.html#position
-			var x = 0;
-			var y = 0;
+			let x = 0;
+			let y = 0;
 			if (e.pageX || e.pageY) {
 				x = e.pageX;
 				y = e.pageY;
@@ -1235,7 +1233,7 @@ var Voronoi = {
 		},
 
 	draw: function() {
-		var ctx = this.canvas.getContext('2d');
+		let ctx = this.canvas.getContext('2d');
 		this.drawBackground(ctx);
 		this.drawSites(ctx);
 		// sweep line
@@ -1268,11 +1266,11 @@ var Voronoi = {
 		},
 
 	drawSites: function(ctx) {
-		var queueIsEmpty = this.queueIsEmpty();
+		let queueIsEmpty = this.queueIsEmpty();
 		ctx.beginPath();
-		var nSites=this.sites.length;
-		for (var iSite=0; iSite<nSites; iSite++){
-			var site=this.sites[iSite];
+		let nSites=this.sites.length;
+		for (let iSite=0; iSite<nSites; iSite++){
+			let site=this.sites[iSite];
 			if (queueIsEmpty) {
 				ctx.rect(site.x-0.25,site.y-0.25,1.5,1.5);
 				}
@@ -1286,13 +1284,13 @@ var Voronoi = {
 		},
 
 	drawCells: function() {
-		var colvalues = '0123456789ABCDEF';
-		var ctx = this.canvas.getContext('2d');
-		var cells = this.getCells();
+		let colvalues = '0123456789ABCDEF';
+		let ctx = this.canvas.getContext('2d');
+		let cells = this.getCells();
 		if (!cells) {return;}
-		var halfedges, nHalfedges, iHalfedge;
-		var v;
-		for (var cellid in cells) {
+		let halfedges, nHalfedges, iHalfedge;
+		let v;
+		for (let cellid in cells) {
 			halfedges = cells[cellid].halfedges;
 			nHalfedges = halfedges.length;
 			//this.assert(nSegments > 0);
@@ -1310,23 +1308,23 @@ var Voronoi = {
 
 	drawBeachline: function(ctx) {
 		// skip if no beach sections
-		var nArcs=this.arcs.length;
+		let nArcs=this.arcs.length;
 		if (!nArcs) {return;}
 		// prepare canvas drawing
-		var cw = this.canvas.width;
+		let cw = this.canvas.width;
 		ctx.lineWidth = 1;
 		// sweep line is parabolas' directrix
-		var directrix = this.sweep;
+		let directrix = this.sweep;
 		// prime left cut coordinates, this way
 		// we have only one cut to compute for
 		// each arc as we walk through them from left
 		// to right
-		var arc = this.arcs[0];
-		var xl = 0;
-		var yl, xr, yr;
-		var focx = arc.site.x;
-		var focy = arc.site.y;
-		var p;
+		let arc = this.arcs[0];
+		let xl = 0;
+		let yl, xr, yr;
+		let focx = arc.site.x;
+		let focy = arc.site.y;
+		let p;
 		if (focy == directrix) {
 			xl = focx;
 			yl = 0;
@@ -1336,17 +1334,17 @@ var Voronoi = {
 			yl = (focx*focx)/(4*p)+focy-p;
 			}
 		// walk through all beach sections
-		var neighbour;
-		var ac_x, ac_y, bc_x, bc_y, gx, gy, n;
-		var pi_by_2 = this.PI*2;
-		for (var iArc=0; iArc<nArcs; iArc++) {
+		let neighbour;
+		let ac_x, ac_y, bc_x, bc_y, gx, gy, n;
+		let pi_by_2 = this.PI*2;
+		for (let iArc=0; iArc<nArcs; iArc++) {
 			arc = this.arcs[iArc];
 			// site is parabola's focus
 			focx=arc.site.x;
 			focy=arc.site.y;
 			// draw circle event associated with the beach section
 			if ( arc.isCollapsing() ) {
-				var circEvent = arc.circleEvent;
+				let circEvent = arc.circleEvent;
 				ctx.save();
 				ctx.globalAlpha=0.25;
 				ctx.fillStyle='#800';
@@ -1428,10 +1426,10 @@ var Voronoi = {
 	drawVertices: function(ctx) {
 		ctx.beginPath();
 		ctx.globalAlpha=1;
-		var nEdges=this.edges.length;
-		var edge;
-		var va, vb;
-		for (var iEdge=0; iEdge<nEdges; iEdge++) {
+		let nEdges=this.edges.length;
+		let edge;
+		let va, vb;
+		for (let iEdge=0; iEdge<nEdges; iEdge++) {
 			edge=this.edges[iEdge];
 			va = edge.va;
 			if (va !== undefined) {
@@ -1450,10 +1448,10 @@ var Voronoi = {
 		ctx.beginPath();
 		ctx.lineWidth=0.5;
 		ctx.globalAlpha=1;
-		var nEdges=this.edges.length;
-		var edge;
-		var va, vb;
-		for (var iEdge=0; iEdge<nEdges; iEdge++) {
+		let nEdges=this.edges.length;
+		let edge;
+		let va, vb;
+		for (let iEdge=0; iEdge<nEdges; iEdge++) {
 			edge=this.edges[iEdge];
 			// skip dangling edges, they will be connected in some future
 			if (edge.va === undefined || edge.vb === undefined) {continue;}
@@ -1464,79 +1462,18 @@ var Voronoi = {
 			}
 		ctx.strokeStyle='#000';
 		ctx.stroke();
-		},
+	}
+};
 
-	dumpBeachline: function() {
-		var html='';
-		// various stats
-		html+='Total number of sites processed: '+this.NUM_SITES_PROCESSED;
-		html+='<br>Number of binary searches: '+this.BINARY_SEARCHES+'<br>Avg number of iterations per binary search: '+(this.BINARY_SEARCH_ITERATIONS/this.BINARY_SEARCHES).toFixed(2);
-		html+='<br>Number of parabolic cut calculations: '+this.PARABOLIC_CUT_CALCS+' out of '+this.ALL_PARABOLIC_CUT_CALCS+' total';
-		html+='<br>Average beachline size: '+(this.BEACHLINE_SIZE/this.sites.length).toFixed(2);
-		html+='<br>Average circle event queue size: '+(this.CIRCLE_QUEUE_SIZE/this.sites.length).toFixed(2);
-		html+='<br>Total number of cancelled circle events: '+this.NUM_VOID_EVENTS+' out of '+this.NUM_CIRCLE_EVENTS+' total ('+(this.NUM_VOID_EVENTS/this.NUM_CIRCLE_EVENTS*100).toFixed(0)+'%)';
-		html+='<br>Largest circle events queue size: '+this.LARGEST_CIRCLE_QUEUE_SIZE+' events';
-		html+='<br>Number of destroyed edges (outside the viewport): '+this.NUM_DESTROYED_EDGES+' out of a total of '+this.TOTAL_NUM_EDGES+' edges<br><br>';
-
-		// Beachline
-		var arc;
-		var edge;
-		var htmledge;
-		var nArcs=this.arcs.length;
-		html+='Beachline is composed of '+nArcs+' beach sections:<br>';
-		for (var iArc=0; iArc<nArcs; iArc++) {
-			arc=this.arcs[iArc];
-			// first show edge details, since it's always the edge on the
-			// left, thus the one shared with the beach section on the left
-			htmledge='edge: ';
-			edge=arc.edge;
-			if (edge) {
-				htmledge+='id='+edge.id;
-				if (edge.va) {htmledge+=', start=(x:<b>'+(edge.va.x).toFixed(1)+'</b>, y:<b>'+(edge.va.y).toFixed(1)+'</b>)';}
-				if (edge.vb) {htmledge+=', end=(x:<b>'+(edge.vb.x).toFixed(1)+'</b>, y:<b>'+(edge.vb.y).toFixed(1)+'</b>)';}
-				}
-			else {
-				htmledge+='none';
-				}
-			if (!edge) {
-				htmledge='<span style="margin-left:2em;color:#ccc">'+htmledge;
-				}
-			else if (!edge.va && !edge.vb) {
-				htmledge='<span style="margin-left:2em;color:#888">'+htmledge;
-				}
-			else {
-				//this.assert((edge.va === undefined) != (edge.vb === undefined));
-				htmledge='<span style="margin-left:2em;color:#444">'+htmledge;
-				}
-			html+=htmledge+'</span><br>';
-			// then display beach section details
-			var xleft=this.leftBreakPoint(iArc,this.sweep);
-			var xright=this.rightBreakPoint(iArc,this.sweep);
-			html+='<span style="color:'+(arc.isCollapsing()?'#800':'#080')+'">';
-			html+='xl=<b>'+xleft.toFixed(4)+'</b>, xr=<b>'+xright.toFixed(4)+'</b>, site={id:'+arc.site.id+', x:<b>'+arc.site.x+'</b>, y:<b>'+arc.site.y+'</b>}';
-			if (arc.isCollapsing()) {
-				html+=', collapsing at {x:<b>'+arc.circleEvent.x.toFixed(4)+'</b>, y:<b>'+arc.circleEvent.y.toFixed(4)+'</b>}';
-				}
-			html+='</span><br>';
-			}
-		var el=document.getElementById('console');
-		if (el) {el.innerHTML=html;}
-		}
-	};
-
-// TODO: fix this
-var VoronoiAnimateTimer;
-var VoronoiAnimatePixels;
-var VoronoiAnimateDelay;
+let VoronoiAnimateTimer;
+let VoronoiAnimatePixels;
+let VoronoiAnimateDelay;
 function VoronoiAnimateCallback() {
 	VoronoiAnimateTimer = undefined;
 	Voronoi.processUpTo(Voronoi.sweep+VoronoiAnimatePixels);
 	Voronoi.draw();
 	if (!Voronoi.queueIsEmpty() || Voronoi.sweep < Voronoi.bbox.yb) {
 		VoronoiAnimateTimer = setTimeout(VoronoiAnimateCallback,VoronoiAnimateDelay);
-		}
-	else {
-		Voronoi.dumpBeachline();
 		}
 	}
 function VoronoiAnimate(px,ms) {
@@ -1557,6 +1494,5 @@ function VoronoiAnimateStop() {
 	if (VoronoiAnimateTimer !== undefined) {
 		clearTimeout(VoronoiAnimateTimer);
 		VoronoiAnimateTimer = undefined;
-		Voronoi.dumpBeachline();
 		}
 	}
