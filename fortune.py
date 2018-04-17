@@ -115,7 +115,6 @@ def circle(a, b, c):
 
 
 def addParabola(event):
-    print(event)
     point = event.point
     parabola = Parabola(point, event, None, None)
     parabola.pointsX = range(point[0] - 20, point[0] + 20)
@@ -230,13 +229,13 @@ while len(queue) != 0:
     heapq._heapify_max(queue)
     event = heapq._heappop_max(queue)
     print("\n")
-    print(event)
+    print(event[1])
     # beachLineParabX.clear()
     # beachLineParabY.clear()
 
     if event[1].eventType:  # site event
         # beachLineSites.append((event[1].x, event[0]))
-        addParabola(event)
+        addParabola(event[1])
     else:  # circle event
         removeParabola(event.parab)
 
