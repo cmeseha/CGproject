@@ -35,8 +35,6 @@ var Voronoi = {
 	pow: self.Math.pow,
 	PI: self.Math.PI,
 	isNaN: self.isNaN,
-	DEFAULT_CANVAS_WIDTH: 800,
-	DEFAULT_CANVAS_HEIGHT: 600,
 	canvas: null,
 	canvasMargin: 0,
 	bbox: {xl:0,xr:800,yt:0,yb:600},
@@ -1187,8 +1185,8 @@ var Voronoi = {
 		if (!canvas.getContext) {return;}
 		var ctx = canvas.getContext('2d');
 		if (!ctx) {return;}
-		canvas.width = this.DEFAULT_CANVAS_WIDTH;
-		canvas.height = this.DEFAULT_CANVAS_HEIGHT;
+		canvas.width = 800;
+		canvas.height = 600;
 		ctx.fillStyle='#fff';
 		ctx.rect(0,0,canvas.width,canvas.height);
 		ctx.fill();
